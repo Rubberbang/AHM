@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pap">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AHM Choir - Contact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; } h1, h2, .font-serif { font-family: 'Playfair Display', serif; }</style>
+</head>
+<body class="bg-stone-50">
+    <!-- Navbar (Use the same updated Nav from Index) -->
+    <nav class="bg-emerald-900 text-white h-20 flex items-center px-4">
+        <div class="max-w-6xl mx-auto w-full flex justify-between items-center">
+            <a href="index.html" class="font-serif text-xl md:text-2xl font-bold">Koor AHM</a>
+            <div class="flex gap-4 items-center">
+                <a href="index.html" data-t="home" class="hidden md:block">Home</a>
+                <select id="langSelect" class="bg-emerald-800 text-white p-1 rounded text-xs lang-selector">
+                    <option value="pap">PAP</option><option value="en">EN</option><option value="es">ES</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <div class="py-12 md:py-20 max-w-4xl mx-auto px-4">
+        <div id="contact-form-container">
+            <h1 class="text-3xl md:text-5xl font-bold text-center mb-8 md:mb-12" data-t="contact_title">Tuma Contacto</h1>
+            <!-- Fixed padding: p-6 on mobile, p-10 on desktop -->
+            <form id="contactForm" class="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] shadow-lg border space-y-4 md:space-y-6">
+                <input type="text" placeholder="Nomber" required class="w-full p-3 md:p-4 bg-stone-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                <input type="email" placeholder="Email" required class="w-full p-3 md:p-4 bg-stone-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                <textarea rows="4" placeholder="Mensahe" required class="w-full p-3 md:p-4 bg-stone-50 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                <button type="submit" class="w-full py-3 md:py-4 bg-emerald-900 text-white rounded-xl font-bold text-sm md:text-base" data-t="send_message">Manda Mensahe</button>
+            </form>
+        </div>
+        <div id="success-message" class="hidden text-center bg-white p-10 rounded-[2rem] shadow-xl border border-emerald-100">
+            <h2 class="text-2xl md:text-3xl font-serif font-bold mb-4" data-t="message_sent">Mensahe Mandá!</h2>
+            <button onclick="location.reload()" class="py-3 px-8 bg-emerald-900 text-white rounded-2xl font-bold">Volbe</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
