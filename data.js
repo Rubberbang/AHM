@@ -20,7 +20,7 @@ const TRANSLATIONS = {
         mission_community_desc: 'Un famia di amigonan uni den fe, apoyando otro den Hesus y Maria.',
         mission_heritage: 'Herencia Arubiano',
         mission_heritage_desc: 'Ancra den e rikesa cultural y tradishonnan spiritual di nos isla.',
-        our_story_title: 'Nos Historia',
+        our_story_title: 'Nos Storia',
         history_p1: 'Fundá pa miembronan dedica di e comunidad Catolico Arubiano, AHM a crece bira un grupo vibrante di cantante y musiconan.',
         history_p2: 'Unda cu nos presenta, sea na Paradera, Noord of otro misa, nos meta ta hiba e mensahe di fe via nos harmonianan.'
     },
@@ -58,7 +58,7 @@ const TRANSLATIONS = {
         mission_community_desc: 'Una familia de amigos unidos en la fe, apoyándonos unos a otros en Jesús y María.',
         mission_heritage: 'Herencia Arubana',
         mission_heritage_desc: 'Arraigados en la riqueza cultural y las tradiciones espirituales de nuestra isla.',
-        our_story_title: 'Nuestra Historia',
+        our_story_title: 'Nuestra Storia',
         history_p1: 'Fundado por miembros dedicados de la comunidad católica de Aruba, AHM ha crecido hasta convertirse en un vibrante grupo de cantantes y músicos.',
         history_p2: 'Dondequiera que actuamos, ya sea en Paradera, Noord u otras parroquias, nuestro objetivo es llevar el mensaje de la fe a través de nuestras armonías.'
 
