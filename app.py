@@ -11,7 +11,11 @@ app = Flask(__name__)
 app.secret_key = 'aruba_choir_secret_key_2024'
 
 # CORS configuration
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "http://localhost:5500"])
+# Update this line in app.py to include your GitHub Pages URL
+CORS(app, supports_credentials=True, origins=[
+    "http://127.0.0.1:5500",
+    "https://rubberbang.github.io"
+])
 
 # DATABASE CONFIG
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///choir.db'
