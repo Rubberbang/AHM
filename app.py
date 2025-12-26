@@ -8,17 +8,19 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = 'aruba_choir_secret_key_2024'
+# Secret key for sessions. In production, set this in Azure Configuration
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'aruba_choir_secret_key_2024')
 
-# CORS configuration
-# Update this line in app.py to include your GitHub Pages URL
-CORS(app, supports_credentials=True, origins=[
-    "http://127.0.0.1:5500",
-    "https://rubberbang.github.io"
-])
+# CORS Configuration
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "https://rubberbang.github.io", "https://your-app-name.onrender.com"])
 
 # DATABASE CONFIG
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///choir.db'
+# Fix: Azure Linux apps wipe files unless stored in /home
+if os.environ.get('AZURE_REGION'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/choir.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///choir.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -27,12 +29,14 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
-app.config['MAIL_PASSWORD'] = 'vwxl ctph hwqa iqpc'
+# We pull the password from Azure settings for security
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'vwxl ctph hwqa iqpc')
 mail = Mail(app)
 
-# SECURITY: This is a hashed version of 'ahm_aruba_2024'
-# In a professional app, you'd store this string in a .env file
-ADMIN_HASH = "scrypt:32768:8:1$XPf4npkcwjnnmbIm$1b184b18630d88a76ec6046bb5978287b0bc8bf302c2c551f3161e281d1980d8bc1bca6330ab7d736afc2502f31ee27fd568b7f5198700ef46d64695751cea77"
+# SECURITY: The hashed password
+# Pull from Azure settings, fallback to the hash we generated earlier
+DEFAULT_HASH = "scrypt:32768:8:1$XPf4npkcwjnnmbIm$1b184b18630d88a76ec6046bb5978287b0bc8bf302c2c551f3161e281d1980d8bc1bca6330ab7d736afc2502f31ee27fd568b7f5198700ef46d64695751cea77"
+ADMIN_HASH = os.environ.get('ADMIN_HASH', DEFAULT_HASH)
 
 # --- MODELS ---
 class Event(db.Model):
@@ -56,11 +60,10 @@ class ContactMessage(db.Model):
 with app.app_context():
     db.create_all()
 
-# --- SECURITY ---
+# --- SECURITY DECORATOR ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # We check the Authorization header for our "token"
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith("Bearer "):
             return jsonify({"message": "Unauthorized"}), 401
@@ -69,18 +72,21 @@ def login_required(f):
 
 # --- ROUTES ---
 
+@app.route('/')
+def health_check():
+    return "AHM Backend is Running Successfully!"
+
 @app.route('/api/login', methods=['POST'], strict_slashes=False)
 def login():
     data = request.json
-    # Check the hashed password
     if check_password_hash(ADMIN_HASH, data.get('password')):
+        # For simplicity, we use the original password as the token
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
 
 @app.route('/api/events', methods=['GET'], strict_slashes=False)
 def get_events():
     today = datetime.now().strftime('%Y-%m-%d')
-    # Public only sees future/today events
     events = Event.query.filter(Event.date >= today).order_by(Event.date.asc()).all()
     return jsonify([{
         'id': e.id, 'title': e.title, 'location': e.location, 'date': e.date,
@@ -137,14 +143,15 @@ def contact():
     db.session.add(new_msg)
     db.session.commit()
     try:
-        msg = Message(subject=f"New Message: {data['name']}", sender=app.config['MAIL_USERNAME'],
+        msg = Message(subject=f"Website Message: {data['name']}", sender=app.config['MAIL_USERNAME'],
                       recipients=['cayatapapia@gmail.com'],
                       body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company','N/A')}\n\n{data['message']}")
         mail.send(msg)
-    except: pass
+    except Exception as e:
+        print(f"Mail failed: {e}")
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    # Use the port assigned by the host, or 5000 as a fallback
+    # Bind to 0.0.0.0 and dynamic port for Azure
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)

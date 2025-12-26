@@ -1,7 +1,7 @@
 /**
- * main.js - Final Polish Version
+ * main.js - Production Version
  */
-const API_BASE_URL = "http://127.0.0.1:5001/api";
+const API_BASE_URL = "https://YOUR_AZURE_APP_NAME.azurewebsites.net/api";
 let currentLang = localStorage.getItem('lang') || 'pap';
 
 function updateLanguage(lang) {
@@ -45,8 +45,6 @@ async function renderEvents() {
 
         list.innerHTML = events.map(event => {
             const isCanceled = event.is_canceled === true;
-
-            // Create Google Maps Link
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 
             return `
@@ -59,7 +57,6 @@ async function renderEvents() {
                     <div class="p-6 md:p-8 md:w-3/4">
                         <h2 class="text-xl md:text-2xl font-bold ${isCanceled ? 'line-through text-stone-400' : 'text-stone-800'} font-serif mb-2">${event.title}</h2>
                         <div class="flex flex-wrap gap-4 text-stone-500 text-xs md:text-sm mb-4">
-                            <!-- GOOGLE MAPS LINK -->
                             <a href="${mapsUrl}" target="_blank" class="flex items-center gap-1 hover:text-emerald-700 hover:underline">
                                 📍 ${event.location}
                             </a>
@@ -75,7 +72,37 @@ async function renderEvents() {
     }
 }
 
-// ... (Contact form logic stays the same)
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('contact-submit-btn');
+        const formData = {
+            name: document.getElementById('contact-name').value,
+            email: document.getElementById('contact-email').value,
+            company: document.getElementById('contact-company') ? document.getElementById('contact-company').value : '',
+            message: document.getElementById('contact-message').value
+        };
+
+        try {
+            btn.innerText = "Mandando...";
+            btn.disabled = true;
+            const response = await fetch(`${API_BASE_URL}/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                document.getElementById('contact-form-container').classList.add('hidden');
+                document.getElementById('success-message').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        } catch (error) {
+            alert("Error mandando mensahe.");
+            btn.disabled = false;
+        }
+    });
+}
 
 window.onload = async () => {
     document.querySelectorAll('.lang-selector').forEach(select => {
