@@ -141,4 +141,6 @@ def contact():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # Use the port assigned by the host, or 5000 as a fallback
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
