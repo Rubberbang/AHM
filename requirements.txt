@@ -6,3 +6,4 @@ gunicorn==23.0.0
 python-dotenv==1.2.1
 SQLAlchemy==2.0.45
 Werkzeug==3.1.4
+psycopg2-binary

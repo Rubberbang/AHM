@@ -15,9 +15,14 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'aruba_choir_secret_key_2024
 CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "https://rubberbang.github.io", "https://your-app-name.onrender.com"])
 
 # DATABASE CONFIG
-# Fix: Azure Linux apps wipe files unless stored in /home
-if os.environ.get('AZURE_REGION'):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/choir.db'
+# 1. Get the URL from the environment (Render) or use local SQLite for testing
+db_url = os.environ.get('postgresql://choir_user:PtYXUt5h2eUgHHKj5gKgv5qRiMqheanu@dpg-d57ieaggjchc739kent0-a/choir')
+
+if db_url:
+    # Fix for Render: SQLAlchemy requires 'postgresql://' but Render provides 'postgres://'
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///choir.db'
 
