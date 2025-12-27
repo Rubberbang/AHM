@@ -24,7 +24,7 @@
             <input type="password" id="admin-password" placeholder="Password"
                 class="w-full p-4 border border-stone-200 rounded-xl mb-4 outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
             <button onclick="login()" class="w-full py-4 bg-emerald-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-800 transition-all">
-                Enter Dashboard
+                Login
             </button>
         </div>
     </div>
@@ -39,7 +39,7 @@
                     <h1 class="text-xl font-bold">AHM Admin</h1>
                 </div>
                 <div class="flex gap-4 md:gap-8 items-center">
-                    <button onclick="showTab('events')" class="text-sm font-medium hover:text-emerald-300">Events</button>
+                    <button onclick="showTab('events')" class="text-sm font-medium hover:text-emerald-300">Evento</button>
                     <button onclick="showTab('messages')" class="text-sm font-medium hover:text-emerald-300">Inbox</button>
                     <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
                 </div>
@@ -55,7 +55,7 @@
                 <div class="lg:hidden mb-6">
                     <button onclick="toggleMobileForm()" id="mobile-form-btn" class="w-full py-4 bg-white border-2 border-emerald-900 text-emerald-900 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm">
                         <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                        <span id="btn-text">Add New Event</span>
+                        <span id="btn-text">Evento nobo</span>
                     </button>
                 </div>
 
@@ -64,19 +64,19 @@
                     <!-- Form Sidebar -->
                     <div id="add-event-sidebar" class="hidden lg:block lg:col-span-1">
                         <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 lg:sticky lg:top-28">
-                            <h2 class="text-xl font-bold mb-6 text-stone-800">Add New Event</h2>
+                            <h2 class="text-xl font-bold mb-6 text-stone-800">Evento nobo</h2>
                             <form id="addEventForm" class="space-y-4">
-                                <input type="text" id="ev-title" placeholder="Event Title" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                 <input type="date" id="ev-date" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                 <input type="time" id="ev-time" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <input type="text" id="ev-location" placeholder="Location" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <textarea id="ev-description" placeholder="Description" rows="3" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                                <input type="text" id="ev-location" placeholder="Luga" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <textarea id="ev-description" placeholder="Descripcion" rows="3" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
                                 <select id="ev-type" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                     <option value="Mass">Mass</option>
                                     <option value="Concert">Concert</option>
                                     <option value="Special Service">Special Service</option>
                                 </select>
-                                <button type="submit" class="w-full py-4 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Event</button>
+                                <button type="submit" class="w-full py-4 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Evento</button>
                             </form>
                         </div>
                     </div>
@@ -86,7 +86,7 @@
                         <section>
                             <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2">
                                 <i data-lucide="calendar-days" class="text-emerald-600 w-5 h-5"></i>
-                                Upcoming Events
+                                Eventonan Biniendo
                             </h2>
                             <div id="admin-events-list" class="space-y-4"></div>
                         </section>
@@ -94,7 +94,7 @@
                         <section class="pt-8 border-t border-stone-200">
                             <h2 class="text-lg font-bold mb-6 text-stone-400 flex items-center gap-2">
                                 <i data-lucide="archive" class="w-4 h-4"></i>
-                                Archive (Past Events)
+                                Archive (Eventonan Bieu)
                             </h2>
                             <div id="admin-archive-list" class="space-y-3 opacity-70"></div>
                         </section>
