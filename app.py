@@ -14,6 +14,7 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'aruba_choir_secret_key_2024
 # CORS Configuration
 CORS(app, supports_credentials=True, origins=[
     "http://127.0.0.1:5500",
+    "http://localhost:5500",
     "https://rubberbang.github.io",
     "https://ahmkoor.com",
     "https://www.ahmkoor.com"
