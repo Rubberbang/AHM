@@ -8,8 +8,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-# Secret key for sessions
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'aruba_choir_secret_key_2024')
+
+# SECURITY: Get from Render, fallback to a dummy string for local testing only
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'local-secret-key-only')
 
 # CORS Configuration
 CORS(app, supports_credentials=True, origins=[
@@ -22,8 +23,8 @@ CORS(app, supports_credentials=True, origins=[
 
 # DATABASE CONFIG
 db_url = os.environ.get('DATABASE_URL')
-
 if db_url:
+    # Fix for Render providing 'postgres://' instead of 'postgresql://'
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -38,12 +39,13 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'vwxl ctph hwqa iqpc')
+# SECURITY: This is now pulled safely from Render settings
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 mail = Mail(app)
 
-# SECURITY
-DEFAULT_HASH = "scrypt:32768:8:1$XPf4npkcwjnnmbIm$1b184b18630d88a76ec6046bb5978287b0bc8bf302c2c551f3161e281d1980d8bc1bca6330ab7d736afc2502f31ee27fd568b7f5198700ef46d64695751cea77"
-ADMIN_HASH = os.environ.get('ADMIN_HASH', DEFAULT_HASH)
+# SECURITY: Get the hash from Render
+# If Render environment variable is missing, it uses a dummy hash that won't work
+ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
 # --- MODELS ---
 class Event(db.Model):
@@ -86,7 +88,7 @@ def health_check():
 @app.route('/api/login', methods=['POST'], strict_slashes=False)
 def login():
     data = request.json
-    if check_password_hash(ADMIN_HASH, data.get('password')):
+    if ADMIN_HASH != 'no-hash-provided' and check_password_hash(ADMIN_HASH, data.get('password')):
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
 
@@ -148,17 +150,37 @@ def delete_message(id):
 @app.route('/api/contact', methods=['POST'], strict_slashes=False)
 def contact():
     data = request.json
-    new_msg = ContactMessage(name=data['name'], email=data['email'], company=data.get('company',''), message=data['message'])
-    db.session.add(new_msg)
-    db.session.commit()
     try:
-        msg = Message(subject=f"Website Message: {data['name']}", sender=app.config['MAIL_USERNAME'],
-                      recipients=['cayatapapia@gmail.com'],
-                      body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company','N/A')}\n\n{data['message']}")
-        mail.send(msg)
-    except Exception as e:
-        print(f"Mail failed: {e}")
-    return jsonify({"status": "success"})
+        # 1. Save to Database
+        new_msg = ContactMessage(
+            name=data['name'],
+            email=data['email'],
+            company=data.get('company', ''),
+            message=data['message']
+        )
+        db.session.add(new_msg)
+        db.session.commit()
+
+        # 2. Attempt to send email quietly
+        try:
+            # Only attempt if password is provided in environment
+            if app.config['MAIL_PASSWORD']:
+                msg = Message(
+                    subject=f"AHM Website: {data['name']}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=['cayatapapia@gmail.com'],
+                    body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
+                )
+                mail.send(msg)
+                print("Email sent successfully!")
+        except Exception as mail_err:
+            print(f"Email failed but message saved to DB: {mail_err}")
+
+        return jsonify({"status": "success", "message": "Mensahe a drenta"}), 200
+
+    except Exception as db_err:
+        print(f"Critical Database Error: {db_err}")
+        return jsonify({"status": "error", "message": "Server Error"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
