@@ -8,18 +8,22 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-# Secret key for sessions. In production, set this in Azure Configuration
+# Secret key for sessions
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'aruba_choir_secret_key_2024')
 
 # CORS Configuration
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5500", "https://rubberbang.github.io", "https://your-app-name.onrender.com"])
+# REPLACE 'ahm-choir-backend' with your actual Render service name
+CORS(app, supports_credentials=True, origins=[
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "https://rubberbang.github.io",
+    "https://ahm-choir-backend.onrender.com"
+])
 
 # DATABASE CONFIG
-# 1. Get the URL from the environment (Render) or use local SQLite for testing
-db_url = os.environ.get('postgresql://choir_user:PtYXUt5h2eUgHHKj5gKgv5qRiMqheanu@dpg-d57ieaggjchc739kent0-a/choir')
+db_url = os.environ.get('DATABASE_URL')
 
 if db_url:
-    # Fix for Render: SQLAlchemy requires 'postgresql://' but Render provides 'postgres://'
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
@@ -34,12 +38,10 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
-# We pull the password from Azure settings for security
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'vwxl ctph hwqa iqpc')
 mail = Mail(app)
 
-# SECURITY: The hashed password
-# Pull from Azure settings, fallback to the hash we generated earlier
+# SECURITY
 DEFAULT_HASH = "scrypt:32768:8:1$XPf4npkcwjnnmbIm$1b184b18630d88a76ec6046bb5978287b0bc8bf302c2c551f3161e281d1980d8bc1bca6330ab7d736afc2502f31ee27fd568b7f5198700ef46d64695751cea77"
 ADMIN_HASH = os.environ.get('ADMIN_HASH', DEFAULT_HASH)
 
@@ -85,7 +87,6 @@ def health_check():
 def login():
     data = request.json
     if check_password_hash(ADMIN_HASH, data.get('password')):
-        # For simplicity, we use the original password as the token
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
 
@@ -103,7 +104,10 @@ def get_events():
 @login_required
 def get_all_events():
     events = Event.query.order_by(Event.date.desc()).all()
-    return jsonify([{'id':e.id, 'title':e.title, 'location':e.location, 'date':e.date, 'time':e.time, 'is_canceled':e.is_canceled} for e in events])
+    return jsonify([{
+        'id':e.id, 'title':e.title, 'location':e.location, 'date':e.date,
+        'time':e.time, 'is_canceled':e.is_canceled
+    } for e in events])
 
 @app.route('/api/admin/events', methods=['POST'], strict_slashes=False)
 @login_required
@@ -157,6 +161,5 @@ def contact():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    # Bind to 0.0.0.0 and dynamic port for Azure
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
