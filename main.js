@@ -1,7 +1,7 @@
 /**
  * main.js - Production Version
  */
-const API_BASE_URL = "https://ahm-7gom.onrender.com/api";
+const API_BASE_URL = "https://api.ahmkoor.com/api";
 let currentLang = localStorage.getItem('lang') || 'pap';
 
 function updateLanguage(lang) {
