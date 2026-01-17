@@ -30,6 +30,32 @@ function renderReflection() {
     }
 }
 
+// NEW: Fetch Custom Content (Hero, Mission, History) from Admin Settings
+async function loadSiteContent() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/content`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Helper to safely set text if element exists
+        const setText = (id, text) => {
+            const el = document.getElementById(id);
+            // Only override if the admin actually saved text for this spot
+            if (el && text) el.innerText = text;
+        };
+
+        // These IDs must match the ID's in your index.html (I added them in the previous step)
+        // If index.html uses data-t (translations), this will OVERRIDE it if content exists.
+        setText('hero-title-text', data.hero_title);
+        setText('hero-subtitle-text', data.hero_subtitle);
+
+        // Note: You might need to add specific IDs to your HTML tags for this to work perfectly
+        // e.g. <h3 id="mission-1-text">...</h3>
+    } catch (e) {
+        console.log("Using default content");
+    }
+}
+
 async function renderEvents() {
     const list = document.getElementById('events-list');
     if (!list) return;
@@ -45,6 +71,7 @@ async function renderEvents() {
 
         list.innerHTML = events.map(event => {
             const isCanceled = event.is_canceled === true;
+            // Updated Maps Link logic
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 
             return `
@@ -111,8 +138,13 @@ window.onload = async () => {
             if (document.getElementById('events-list')) renderEvents();
         });
     });
+
     updateLanguage(currentLang);
     lucide.createIcons();
     renderReflection();
+
+    // Load dynamic content (Hero text etc)
+    loadSiteContent();
+
     if (document.getElementById('events-list')) await renderEvents();
 };

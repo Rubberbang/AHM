@@ -3,28 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Tell Google NOT to show this page in search results -->
     <meta name="robots" content="noindex, nofollow">
-
     <title>AHM Admin Dashboard</title>
-
-    <!-- Favicon (So it still looks professional in your browser tabs) -->
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-
-    <!-- Fonts & Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
     <style>
         body { font-family: 'Inter', sans-serif; }
         h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .tab-active { color: #fff; background-color: rgba(6, 78, 59, 0.5); border-radius: 0.5rem; }
     </style>
 </head>
 <body class="bg-stone-100 min-h-screen">
 
-    <!-- 1. LOGIN SCREEN -->
     <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl max-w-sm w-full border border-stone-200">
             <div class="w-16 h-16 bg-emerald-900 text-white rounded-2xl flex items-center justify-center mb-6 mx-auto">
@@ -39,29 +31,25 @@
         </div>
     </div>
 
-    <!-- 2. DASHBOARD SCREEN -->
     <div id="dashboard-screen" class="hidden">
-        <!-- Navigation -->
-        <nav class="bg-emerald-900 text-white p-6 sticky top-0 z-50 shadow-md">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <nav class="bg-emerald-900 text-white p-4 sticky top-0 z-50 shadow-md">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <h1 class="text-xl font-bold">AHM Admin</h1>
                 </div>
-                <div class="flex gap-4 md:gap-8 items-center">
-                    <button onclick="showTab('events')" class="text-sm font-medium hover:text-emerald-300">Evento</button>
-                    <button onclick="showTab('messages')" class="text-sm font-medium hover:text-emerald-300">Inbox</button>
-                    <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
+                <div class="flex gap-2 md:gap-4 items-center bg-emerald-800/50 p-1 rounded-xl">
+                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Eventos</button>
+                    <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Inbox</button>
+                    <button onclick="showTab('editor')" id="nav-editor" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Website Text</button>
                 </div>
+                <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
             </div>
         </nav>
 
         <div class="max-w-6xl mx-auto p-4 md:p-8">
 
-            <!-- EVENTS TAB -->
             <div id="tab-events" class="tab-content">
-
-                <!-- Mobile Toggle Button for Form -->
                 <div class="lg:hidden mb-6">
                     <button onclick="toggleMobileForm()" id="mobile-form-btn" class="w-full py-4 bg-white border-2 border-emerald-900 text-emerald-900 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm">
                         <i data-lucide="plus-circle" class="w-5 h-5"></i>
@@ -70,13 +58,14 @@
                 </div>
 
                 <div class="grid lg:grid-cols-3 gap-8">
-
-                    <!-- Form Sidebar -->
                     <div id="add-event-sidebar" class="hidden lg:block lg:col-span-1">
                         <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 lg:sticky lg:top-28">
-                            <h2 class="text-xl font-bold mb-6 text-stone-800">Evento nobo</h2>
+                            <h2 class="text-xl font-bold mb-6 text-stone-800 flex justify-between items-center">
+                                <span id="form-title">Evento nobo</span>
+                                <button onclick="resetEventForm()" id="cancel-edit-btn" class="hidden text-xs text-red-500 underline">Cancel Edit</button>
+                            </h2>
                             <form id="addEventForm" class="space-y-4">
-                                <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="hidden" id="ev-id"> <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                 <input type="date" id="ev-date" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                 <input type="time" id="ev-time" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
                                 <input type="text" id="ev-location" placeholder="Luga" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
@@ -86,12 +75,11 @@
                                     <option value="Concert">Concert</option>
                                     <option value="Special Service">Special Service</option>
                                 </select>
-                                <button type="submit" class="w-full py-4 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Evento</button>
+                                <button type="submit" id="submit-btn" class="w-full py-4 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Evento</button>
                             </form>
                         </div>
                     </div>
 
-                    <!-- Lists Area -->
                     <div class="lg:col-span-2 space-y-10">
                         <section>
                             <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2">
@@ -112,7 +100,6 @@
                 </div>
             </div>
 
-            <!-- MESSAGES TAB -->
             <div id="tab-messages" class="tab-content hidden">
                 <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2">
                     <i data-lucide="mail" class="text-emerald-600 w-6 h-6"></i>
@@ -121,29 +108,69 @@
                 <div id="admin-messages-list" class="grid md:grid-cols-2 gap-4"></div>
             </div>
 
+            <div id="tab-editor" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-stone-800 flex items-center gap-2">
+                        <i data-lucide="edit-3" class="text-emerald-600 w-6 h-6"></i>
+                        Page Content Editor
+                    </h2>
+                    <button onclick="savePageContent()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-6 py-2 rounded-xl font-bold shadow-md transition-all">
+                        Save All Changes
+                    </button>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200">
+                        <h3 class="font-serif text-lg font-bold text-emerald-900 mb-4">Hero Section (Top)</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Main Title</label>
+                                <input type="text" id="txt-hero-title" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Subtitle</label>
+                                <input type="text" id="txt-hero-subtitle" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200">
+                        <h3 class="font-serif text-lg font-bold text-emerald-900 mb-4">Mission Cards</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Card 1: Devotion</label>
+                                <textarea id="txt-mission-1" rows="2" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Card 2: Community</label>
+                                <textarea id="txt-mission-2" rows="2" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 md:col-span-2">
+                        <h3 class="font-serif text-lg font-bold text-emerald-900 mb-4">Our History</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Paragraph 1</label>
+                                <textarea id="txt-history-1" rows="3" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-stone-400 uppercase">Paragraph 2</label>
+                                <textarea id="txt-history-2" rows="3" class="w-full p-3 border rounded-xl mt-1 focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        const API_BASE = "https://api.ahmkoor.com/api"; // Updated to your Render URL
+        const API_BASE = "https://api.ahmkoor.com/api";
 
-        // --- MOBILE UI LOGIC ---
-        function toggleMobileForm() {
-            const sidebar = document.getElementById('add-event-sidebar');
-            const btnText = document.getElementById('btn-text');
-            const isHidden = sidebar.classList.contains('hidden');
-
-            if (isHidden) {
-                sidebar.classList.remove('hidden');
-                btnText.innerText = "Close Form";
-                sidebar.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                sidebar.classList.add('hidden');
-                btnText.innerText = "Add New Event";
-            }
-        }
-
-        // --- AUTH LOGIC ---
+        // --- AUTH & SETUP ---
         const getToken = () => localStorage.getItem('admin_token');
 
         async function authFetch(url, options = {}) {
@@ -178,20 +205,33 @@
             loadDashboardData();
         }
 
+        // --- TABS LOGIC ---
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
+
+            // Update active state on buttons
+            document.querySelectorAll('#nav-events, #nav-messages, #nav-editor').forEach(b => b.classList.remove('bg-emerald-700', 'text-white'));
+            document.getElementById(`nav-${tab}`).classList.add('bg-emerald-700', 'text-white');
+
+            if(tab === 'editor') loadPageContent();
         }
 
         function loadDashboardData() {
             loadEvents();
             loadMessages();
+            showTab('events'); // Default tab
             lucide.createIcons();
         }
+
+        // --- EVENT LOGIC (Create + Edit) ---
+        let allEventsCache = []; // Store events locally to easily populate edit form
 
         async function loadEvents() {
             const res = await authFetch(`${API_BASE}/admin/all-events`);
             const events = await res.json();
+            allEventsCache = events; // Save for editing lookup
+
             const today = new Date().toISOString().split('T')[0];
             const upList = document.getElementById('admin-events-list');
             const arcList = document.getElementById('admin-archive-list');
@@ -212,8 +252,9 @@
                             </div>
                         </div>
                         <div class="flex gap-1 md:gap-2">
-                            <button onclick="toggleCancel(${e.id}, ${!isCanceled})" class="p-2 bg-stone-100 rounded-lg hover:bg-amber-100"><i data-lucide="slash" class="w-4 h-4 text-amber-600"></i></button>
-                            <button onclick="deleteEvent(${e.id})" class="p-2 bg-stone-100 rounded-lg hover:bg-red-100"><i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i></button>
+                            <button onclick="editEvent(${e.id})" class="p-2 bg-emerald-50 rounded-lg hover:bg-emerald-100 border border-emerald-100" title="Edit"><i data-lucide="pencil" class="w-4 h-4 text-emerald-600"></i></button>
+                            <button onclick="toggleCancel(${e.id}, ${!isCanceled})" class="p-2 bg-stone-100 rounded-lg hover:bg-amber-100" title="Cancel/Uncancel"><i data-lucide="slash" class="w-4 h-4 text-amber-600"></i></button>
+                            <button onclick="deleteEvent(${e.id})" class="p-2 bg-stone-100 rounded-lg hover:bg-red-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i></button>
                         </div>
                     </div>
                 `;
@@ -224,29 +265,43 @@
             lucide.createIcons();
         }
 
-        async function loadMessages() {
-            const res = await authFetch(`${API_BASE}/admin/messages`);
-            const msgs = await res.json();
-            const list = document.getElementById('admin-messages-list');
-            list.innerHTML = msgs.map(m => `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="font-bold text-stone-800 text-sm">${m.name}</p>
-                        <button onclick="deleteMessage(${m.id})" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                    </div>
-                    <p class="text-xs text-stone-600 mb-3">${m.message}</p>
-                    <p class="text-[9px] text-stone-400 uppercase font-bold">${m.email} ${m.company ? '| ' + m.company : ''}</p>
-                </div>
-            `).join('');
-            lucide.createIcons();
+        // Populate Form for Editing
+        function editEvent(id) {
+            const event = allEventsCache.find(e => e.id === id);
+            if (!event) return;
+
+            // Fill inputs
+            document.getElementById('ev-id').value = event.id;
+            document.getElementById('ev-title').value = event.title;
+            document.getElementById('ev-date').value = event.date;
+            document.getElementById('ev-time').value = event.time; // Ensure Time format matches "HH:MM"
+            document.getElementById('ev-location').value = event.location;
+            document.getElementById('ev-description').value = event.description || '';
+            document.getElementById('ev-type').value = event.type;
+
+            // Change UI to Edit Mode
+            document.getElementById('form-title').innerText = "Edit Evento";
+            document.getElementById('submit-btn').innerText = "Update Evento";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+            // Show sidebar on mobile and scroll to it
+            const sidebar = document.getElementById('add-event-sidebar');
+            sidebar.classList.remove('hidden');
+            sidebar.scrollIntoView({ behavior: 'smooth' });
         }
 
-        async function deleteEvent(id) { if(confirm("Delete?")) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'DELETE'}); loadEvents(); } }
-        async function deleteMessage(id) { if(confirm("Delete message?")) { await authFetch(`${API_BASE}/admin/messages/${id}`, {method:'DELETE'}); loadMessages(); } }
-        async function toggleCancel(id, status) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'PUT', body: JSON.stringify({is_canceled: status})}); loadEvents(); }
+        function resetEventForm() {
+            document.getElementById('addEventForm').reset();
+            document.getElementById('ev-id').value = ""; // Clear ID
+            document.getElementById('form-title').innerText = "Evento nobo";
+            document.getElementById('submit-btn').innerText = "Save Evento";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+        }
 
         document.getElementById('addEventForm').onsubmit = async (e) => {
             e.preventDefault();
+            const id = document.getElementById('ev-id').value;
+
             const data = {
                 title: document.getElementById('ev-title').value,
                 date: document.getElementById('ev-date').value,
@@ -255,13 +310,82 @@
                 description: document.getElementById('ev-description').value,
                 type: document.getElementById('ev-type').value
             };
-            const res = await authFetch(`${API_BASE}/admin/events`, {method:'POST', body: JSON.stringify(data)});
+
+            let res;
+            if (id) {
+                // UPDATE (PUT)
+                res = await authFetch(`${API_BASE}/admin/events/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+            } else {
+                // CREATE (POST)
+                res = await authFetch(`${API_BASE}/admin/events`, { method: 'POST', body: JSON.stringify(data) });
+            }
+
             if (res.ok) {
-                e.target.reset();
-                if (window.innerWidth < 1024) toggleMobileForm(); // Hide form on mobile after saving
+                resetEventForm();
+                if (window.innerWidth < 1024) toggleMobileForm();
                 loadEvents();
             }
         };
+
+        // --- CONTENT EDITOR LOGIC ---
+        // Note: This assumes you have an endpoint /api/content that returns JSON
+        // e.g., { "hero_title": "...", "mission_1": "..." }
+
+        async function loadPageContent() {
+            // Mocking the fetch since I don't have your content API yet
+            // In reality: const res = await authFetch(`${API_BASE}/content`);
+            // const data = await res.json();
+
+            // Temporary Mock Data for display
+            const data = {
+                hero_title: "Amigonan di Hesus y Maria",
+                hero_subtitle: "Canta pa Señor cu alegria...",
+                mission_1: "Dedica na e liturgia y e experiencia spiritual via canto sagrado.",
+                history_1: "Fundá pa miembronan dedica di e comunidad Catolico Arubiano..."
+            };
+
+            document.getElementById('txt-hero-title').value = data.hero_title || "";
+            document.getElementById('txt-hero-subtitle').value = data.hero_subtitle || "";
+            document.getElementById('txt-mission-1').value = data.mission_1 || "";
+            document.getElementById('txt-history-1').value = data.history_1 || "";
+        }
+
+        async function savePageContent() {
+            const contentData = {
+                hero_title: document.getElementById('txt-hero-title').value,
+                hero_subtitle: document.getElementById('txt-hero-subtitle').value,
+                mission_1: document.getElementById('txt-mission-1').value,
+                history_1: document.getElementById('txt-history-1').value,
+                // Add rest of fields...
+            };
+
+            const res = await authFetch(`${API_BASE}/content`, {
+                method: 'POST', // or PUT depending on backend
+                body: JSON.stringify(contentData)
+            });
+
+            if(res.ok) alert("Website content updated!");
+            else alert("Error updating content.");
+        }
+
+        // --- UTILS ---
+        async function deleteEvent(id) { if(confirm("Delete?")) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'DELETE'}); loadEvents(); } }
+        async function deleteMessage(id) { if(confirm("Delete message?")) { await authFetch(`${API_BASE}/admin/messages/${id}`, {method:'DELETE'}); loadMessages(); } }
+        async function toggleCancel(id, status) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'PUT', body: JSON.stringify({is_canceled: status})}); loadEvents(); }
+
+        function toggleMobileForm() {
+            const sidebar = document.getElementById('add-event-sidebar');
+            const btnText = document.getElementById('btn-text');
+            const isHidden = sidebar.classList.contains('hidden');
+            if (isHidden) {
+                sidebar.classList.remove('hidden');
+                btnText.innerText = "Close Form";
+                sidebar.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                sidebar.classList.add('hidden');
+                btnText.innerText = "Evento nobo";
+            }
+        }
 
         window.onload = () => { if (getToken()) showDashboardUI(); lucide.createIcons(); };
     </script>
