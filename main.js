@@ -57,7 +57,7 @@ async function renderEvents() {
         <div class="loader-container">
             <div class="spinner"></div>
         </div>
-        <p class="text-center text-xs text-stone-400 mt-2">Cargando...</p>
+        <p class="text-center text-xs text-stone-400 mt-2">Loading...</p>
     `;
 
     try {
