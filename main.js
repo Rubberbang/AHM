@@ -4,16 +4,72 @@
 const API_BASE_URL = "https://api.ahmkoor.com/api";
 let currentLang = localStorage.getItem('lang') || 'pap';
 
-function updateLanguage(lang) {
+// --- CONFIG FOR FLAGS ---
+const LANG_CONFIG = {
+    pap: { flag: 'https://flagcdn.com/h24/aw.png', text: 'PAP' },
+    en:  { flag: 'https://flagcdn.com/h24/us.png', text: 'EN' },
+    es:  { flag: 'https://flagcdn.com/h24/es.png', text: 'ES' }
+};
+
+// --- LANGUAGE LOGIC ---
+
+// Called when user clicks a flag/button
+function setLang(lang) {
     currentLang = lang;
     localStorage.setItem('lang', lang);
-    document.querySelectorAll('.lang-selector').forEach(sel => sel.value = lang);
+    updateTranslations();
+    updateLanguageVisuals(lang);
+    renderReflection();
+    
+    // Re-render events if we are on the home/calendar page to update date format
+    if (document.getElementById('events-list')) renderEvents();
+}
+
+// Updates the actual text content on the page
+function updateTranslations() {
+    if (typeof TRANSLATIONS === 'undefined') return; // Safety check
+    
     document.querySelectorAll('[data-t]').forEach(el => {
         const key = el.getAttribute('data-t');
-        if (TRANSLATIONS[lang]?.[key]) el.innerText = TRANSLATIONS[lang][key];
+        if (TRANSLATIONS[currentLang]?.[key]) {
+            el.innerText = TRANSLATIONS[currentLang][key];
+        }
     });
-    renderReflection();
 }
+
+// Updates the UI (Flags, Rings, Dropdown Text)
+function updateLanguageVisuals(lang) {
+    // 1. Desktop: Update Main Button
+    const deskFlag = document.getElementById('desk-flag');
+    const deskText = document.getElementById('desk-text');
+    if (deskFlag && deskText) {
+        deskFlag.src = LANG_CONFIG[lang].flag;
+        deskText.innerText = LANG_CONFIG[lang].text;
+    }
+
+    // 2. Mobile: Highlight Selected Flag
+    ['pap', 'en', 'es'].forEach(l => {
+        const btn = document.getElementById(`mob-btn-${l}`);
+        const img = document.getElementById(`mob-img-${l}`);
+        if(btn && img) {
+            if (l === lang) {
+                // Active State
+                btn.classList.remove('opacity-50');
+                btn.classList.add('scale-110'); 
+                img.classList.remove('ring-transparent');
+                img.classList.add('ring-white');
+            } else {
+                // Inactive State
+                btn.classList.add('opacity-50');
+                btn.classList.remove('scale-110');
+                img.classList.add('ring-transparent');
+                img.classList.remove('ring-white');
+            }
+        }
+    });
+}
+
+// --- UI UTILS ---
 
 function toggleMenu() {
     const menu = document.getElementById('mobile-menu');
@@ -24,47 +80,46 @@ function toggleMenu() {
 function renderReflection() {
     const textEl = document.getElementById('inspiration-text');
     const refEl = document.getElementById('inspiration-ref');
-    if (textEl && TRANSLATIONS[currentLang]) {
+    
+    if (textEl && typeof TRANSLATIONS !== 'undefined' && TRANSLATIONS[currentLang]) {
         textEl.innerText = `"${TRANSLATIONS[currentLang].inspiration_text}"`;
         refEl.innerText = `— ${TRANSLATIONS[currentLang].inspiration_ref}`;
     }
 }
 
-// NEW: Check Database for Theme Color Update
+// --- THEME COLOR SYNC ---
 async function checkThemeColor() {
     try {
         const res = await fetch(`${API_BASE_URL}/content`);
         if (!res.ok) return;
         const data = await res.json();
-
+        
         if (data.theme_color) {
             const current = localStorage.getItem('theme_color');
+            // If DB says "Purple" but browser says "Green", update and reload
             if (current !== data.theme_color) {
-                // If DB is different from Browser, update and refresh to apply
                 localStorage.setItem('theme_color', data.theme_color);
-                location.reload();
+                location.reload(); 
             }
         }
-    } catch (e) { console.log("Theme check failed"); }
+    } catch (e) { console.log("Theme check skipped (offline/error)"); }
 }
 
+// --- EVENTS FETCHING ---
 async function renderEvents() {
     const list = document.getElementById('events-list');
     if (!list) return;
 
-    // 1. Show Loader
+    // 1. Show Spinner while loading
     list.innerHTML = `
         <div class="loader-container">
             <div class="spinner"></div>
         </div>
-        <p class="text-center text-xs text-stone-400 mt-2">Loading...</p>
+        <p class="text-center text-xs text-stone-400 mt-2 animate-pulse">Warda un rato, nos ta conectando...</p>
     `;
 
     try {
         const res = await fetch(`${API_BASE_URL}/events`);
-
-        // If the server was sleeping, this might take time.
-        // Once response comes:
         const events = await res.json();
 
         if (events.length === 0) {
@@ -74,7 +129,7 @@ async function renderEvents() {
 
         list.innerHTML = events.map(event => {
             const isCanceled = event.is_canceled === true;
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$?q=${encodeURIComponent(event.location)}`;
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
 
             return `
                 <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-stone-200 flex flex-col md:flex-row overflow-hidden transition-all ${isCanceled ? 'opacity-60 grayscale' : 'hover:shadow-md'}">
@@ -97,53 +152,62 @@ async function renderEvents() {
             `;
         }).join('');
     } catch (error) {
-        list.innerHTML = '<p class="text-center py-10 text-red-500">Error conectando cu servidor (Waking up server...). Refresh page please.</p>';
+        list.innerHTML = '<p class="text-center py-10 text-red-500">Error conectando cu servidor. Refresh page please.</p>';
     }
 }
 
+// --- CONTACT FORM ---
 const contactForm = document.getElementById('contactForm');
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('contact-submit-btn');
+        
         const formData = {
             name: document.getElementById('contact-name').value,
             email: document.getElementById('contact-email').value,
             company: document.getElementById('contact-company') ? document.getElementById('contact-company').value : '',
             message: document.getElementById('contact-message').value
         };
+
         try {
             btn.innerText = "Mandando...";
             btn.disabled = true;
+            
             const response = await fetch(`${API_BASE_URL}/contact`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
+
             if (response.ok) {
                 document.getElementById('contact-form-container').classList.add('hidden');
                 document.getElementById('success-message').classList.remove('hidden');
                 lucide.createIcons();
-            }
+            } else { throw new Error('Failed'); }
         } catch (error) {
-            alert("Error mandando mensahe.");
+            alert("Error mandando mensahe. Purba atrobe.");
+            btn.innerText = "Manda Mensahe";
             btn.disabled = false;
         }
     });
 }
 
+// --- INITIALIZATION ---
 window.onload = async () => {
-    document.querySelectorAll('.lang-selector').forEach(select => {
-        select.addEventListener('change', (e) => {
-            updateLanguage(e.target.value);
-            if (document.getElementById('events-list')) renderEvents();
-        });
-    });
-    updateLanguage(currentLang);
-    lucide.createIcons();
+    // 1. Set Languages & Visuals
+    updateTranslations();
+    updateLanguageVisuals(currentLang);
     renderReflection();
+    
+    // 2. Initialize Icons
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    checkThemeColor(); // Added here
+    // 3. Check for Liturgical Color updates
+    checkThemeColor();
 
-    if (document.getElementById('events-list')) await renderEvents();
+    // 4. Load Events (if on Home/Calendar)
+    if (document.getElementById('events-list')) {
+        await renderEvents();
+    }
 };
