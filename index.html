@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pap">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,17 +26,58 @@
     </script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Loading Spinner */
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #d1fae5;
+            /* Light Emerald */
+            border-top: 4px solid #059669;
+            /* Dark Emerald */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
+
 <body class="bg-stone-50 text-stone-900">
     <nav class="bg-emerald-900 text-white sticky top-0 z-50 shadow-lg border-b border-emerald-800">
         <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="bg-white p-1 rounded-full"><i data-lucide="music" class="text-emerald-900 w-5 h-5"></i></div>
+                <div class="bg-white p-1 rounded-full"><i data-lucide="music" class="text-emerald-900 w-5 h-5"></i>
+                </div>
                 <a href="/" class="font-serif text-xl md:text-2xl font-bold">Koor AHM</a>
             </div>
             <div class="hidden md:flex items-center gap-6">
@@ -43,23 +85,32 @@
                 <a href="/calendar" class="hover:text-emerald-300 transition-colors" data-t="calendar">Kalender</a>
                 <a href="/contact" class="hover:text-emerald-300 transition-colors" data-t="contact">Contacto</a>
                 <a href="/news" class="hover:text-emerald-300">Noticia</a>
-                <select id="langSelect" class="bg-emerald-800 text-white text-xs p-1 rounded lang-selector hover:cursor-pointer">
-                    <option value="pap">PAP</option><option value="en">EN</option><option value="es">ES</option>
+                <select id="langSelect"
+                    class="bg-emerald-800 text-white text-xs p-1 rounded lang-selector hover:cursor-pointer">
+                    <option value="pap">PAP</option>
+                    <option value="en">EN</option>
+                    <option value="es">ES</option>
                 </select>
             </div>
             <button class="md:hidden p-2" onclick="toggleMenu()"><i data-lucide="menu" id="menu-icon"></i></button>
         </div>
-        <div id="mobile-menu" class="hidden bg-emerald-800 border-t border-emerald-700 md:hidden px-4 py-6 space-y-4 shadow-xl">
+        <div id="mobile-menu"
+            class="hidden bg-emerald-800 border-t border-emerald-700 md:hidden px-4 py-6 space-y-4 shadow-xl">
             <a href="/" class="block text-lg border-b border-emerald-700 pb-2" data-t="home">Home</a>
             <a href="/calendar" class="block text-lg border-b border-emerald-700 pb-2" data-t="calendar">Kalender</a>
             <a href="/contact" class="block text-lg border-b border-emerald-700 pb-2" data-t="contact">Contacto</a>
             <select id="langSelectMobile" class="bg-emerald-900 text-white p-2 rounded w-full lang-selector">
-                <option value="pap">PAP</option><option value="en">EN</option><option value="es">ES</option>
+                <option value="pap">PAP</option>
+                <option value="en">EN</option>
+                <option value="es">ES</option>
             </select>
             <div class="flex gap-6 pt-4 justify-start">
-                <a href="#" target="_blank" class="hover:text-emerald-300 transition-colors"><i data-lucide="facebook"></i></a>
-                <a href="https://www.instagram.com/ahm_koor_dakota/" target="_blank" class="hover:text-emerald-300 transition-colors"><i data-lucide="instagram"></i></a>
-                <a href="#" target="_blank" class="hover:text-emerald-300 transition-colors"><i data-lucide="youtube"></i></a>
+                <a href="#" target="_blank" class="hover:text-emerald-300 transition-colors"><i
+                        data-lucide="facebook"></i></a>
+                <a href="https://www.instagram.com/ahm_koor_dakota/" target="_blank"
+                    class="hover:text-emerald-300 transition-colors"><i data-lucide="instagram"></i></a>
+                <a href="#" target="_blank" class="hover:text-emerald-300 transition-colors"><i
+                        data-lucide="youtube"></i></a>
             </div>
         </div>
     </nav>
@@ -67,42 +118,56 @@
     <section class="relative h-[60vh] md:h-[70vh] flex items-center justify-center overflow-hidden bg-emerald-950">
         <img src="./images/Koor.jpg" class="absolute inset-0 w-full h-full object-cover opacity-40">
         <div class="relative z-10 text-center px-6 max-w-4xl">
-            <h1 class="text-3xl md:text-7xl font-bold text-white mb-4 md:mb-6 drop-shadow-lg" data-t="hero_title">Amigonan di Hesus y Maria</h1>
-            <p class="text-lg md:text-2xl text-emerald-100 italic mb-8 md:mb-10 drop-shadow-md" data-t="hero_subtitle">"Canta pa Señor cu alegria..."</p>
-            <a href="/calendar" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg inline-block text-sm md:text-base transition-all hover:scale-105" data-t="upcoming_performances">Próximo Presentacionnan</a>
+            <h1 class="text-3xl md:text-7xl font-bold text-white mb-4 md:mb-6 drop-shadow-lg" data-t="hero_title">
+                Amigonan di Hesus y Maria</h1>
+            <p class="text-lg md:text-2xl text-emerald-100 italic mb-8 md:mb-10 drop-shadow-md" data-t="hero_subtitle">
+                "Canta pa Señor cu alegria..."</p>
+            <a href="/calendar"
+                class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg inline-block text-sm md:text-base transition-all hover:scale-105"
+                data-t="upcoming_performances">Próximo Presentacionnan</a>
         </div>
     </section>
 
     <section class="py-16 md:py-24 px-4 bg-white">
         <div class="max-w-5xl mx-auto">
             <div class="text-center mb-12 md:mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-stone-800 mb-4 font-serif" data-t="mission_title">Nos Mishon</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-stone-800 mb-4 font-serif" data-t="mission_title">Nos
+                    Mishon</h2>
                 <div class="w-20 h-1 bg-emerald-600 mx-auto rounded-full"></div>
             </div>
             <div class="grid md:grid-cols-3 gap-8 md:gap-12">
                 <div class="text-center p-6 hover:bg-stone-50 rounded-3xl transition-colors duration-300">
-                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i data-lucide="music" class="w-8 h-8"></i></div>
+                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i
+                            data-lucide="music" class="w-8 h-8"></i></div>
                     <h3 class="text-xl font-bold mb-3 text-stone-800" data-t="mission_devotion">Devoshon Spiritual</h3>
-                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_devotion_desc">Dedica na e liturgia y e experiencia spiritual via canto sagrado.</p>
+                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_devotion_desc">Dedica
+                        na e liturgia y e experiencia spiritual via canto sagrado.</p>
                 </div>
                 <div class="text-center p-6 hover:bg-stone-50 rounded-3xl transition-colors duration-300">
-                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i data-lucide="users" class="w-8 h-8"></i></div>
+                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i
+                            data-lucide="users" class="w-8 h-8"></i></div>
                     <h3 class="text-xl font-bold mb-3 text-stone-800" data-t="mission_community">Comunidad</h3>
-                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_community_desc">Un famia di amigonan uni den fe, apoyando otro den Hesus y Maria.</p>
+                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_community_desc">Un
+                        famia di amigonan uni den fe, apoyando otro den Hesus y Maria.</p>
                 </div>
                 <div class="text-center p-6 hover:bg-stone-50 rounded-3xl transition-colors duration-300">
-                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i data-lucide="heart" class="w-8 h-8"></i></div>
+                    <div class="inline-block p-4 bg-emerald-50 rounded-2xl text-emerald-700 mb-6 shadow-sm"><i
+                            data-lucide="heart" class="w-8 h-8"></i></div>
                     <h3 class="text-xl font-bold mb-3 text-stone-800" data-t="mission_heritage">Herencia Arubiano</h3>
-                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_heritage_desc">Ancra den e rikesa cultural y tradishonnan spiritual di nos isla.</p>
+                    <p class="text-stone-600 leading-relaxed text-sm md:text-base" data-t="mission_heritage_desc">Ancra
+                        den e rikesa cultural y tradishonnan spiritual di nos isla.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="py-12 md:py-20 px-4 bg-stone-100">
-        <div class="max-w-4xl mx-auto bg-white p-8 md:p-20 rounded-[2rem] md:rounded-[3rem] shadow-xl relative text-center border border-stone-200">
-            <div class="hidden md:block absolute top-10 right-10 opacity-10 text-emerald-900"><i data-lucide="quote" class="w-20 h-20"></i></div>
-            <h2 class="text-xs font-bold text-emerald-700 mb-6 md:mb-10 uppercase tracking-widest" data-t="spiritual_reflection">Reflexion Spiritual</h2>
+        <div
+            class="max-w-4xl mx-auto bg-white p-8 md:p-20 rounded-[2rem] md:rounded-[3rem] shadow-xl relative text-center border border-stone-200">
+            <div class="hidden md:block absolute top-10 right-10 opacity-10 text-emerald-900"><i data-lucide="quote"
+                    class="w-20 h-20"></i></div>
+            <h2 class="text-xs font-bold text-emerald-700 mb-6 md:mb-10 uppercase tracking-widest"
+                data-t="spiritual_reflection">Reflexion Spiritual</h2>
             <p class="text-xl md:text-2xl italic text-stone-800 mb-6 font-serif" id="inspiration-text"></p>
             <p class="text-emerald-700 font-bold" id="inspiration-ref"></p>
         </div>
@@ -110,14 +175,20 @@
 
     <section class="py-16 md:py-24 px-4 bg-white">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
-            <div class="md:w-1/2 w-full"><img src="./images/closeup.jpg" alt="Choir Ensemble" class="rounded-[1.5rem] md:rounded-[2rem] shadow-2xl object-cover w-full h-[300px] md:h-[450px]" /></div>
+            <div class="md:w-1/2 w-full"><img src="./images/closeup.jpg" alt="Choir Ensemble"
+                    class="rounded-[1.5rem] md:rounded-[2rem] shadow-2xl object-cover w-full h-[300px] md:h-[450px]" />
+            </div>
             <div class="md:w-1/2 space-y-4 md:space-y-6">
                 <h2 class="text-3xl font-bold text-stone-800 font-serif" data-t="our_story_title">Nos Historia</h2>
-                <p class="text-base md:text-lg text-stone-600 leading-relaxed" data-t="history_p1">Fundá pa miembronan dedica di e comunidad Catolico Arubiano...</p>
-                <p class="text-base md:text-lg text-stone-600 leading-relaxed" data-t="history_p2">Unda cu nos presenta, sea na Paradera, Noord of otro misa...</p>
+                <p class="text-base md:text-lg text-stone-600 leading-relaxed" data-t="history_p1">Fundá pa miembronan
+                    dedica di e comunidad Catolico Arubiano...</p>
+                <p class="text-base md:text-lg text-stone-600 leading-relaxed" data-t="history_p2">Unda cu nos presenta,
+                    sea na Paradera, Noord of otro misa...</p>
                 <div class="pt-4">
-                    <a href="/calendar" class="text-emerald-700 font-bold hover:text-emerald-600 flex items-center gap-2 group transition-all text-sm md:text-base">
-                        Join Next Service <i data-lucide="chevron-right" class="group-hover:translate-x-1 transition-transform w-5 h-5"></i>
+                    <a href="/calendar"
+                        class="text-emerald-700 font-bold hover:text-emerald-600 flex items-center gap-2 group transition-all text-sm md:text-base">
+                        Join Next Service <i data-lucide="chevron-right"
+                            class="group-hover:translate-x-1 transition-transform w-5 h-5"></i>
                     </a>
                 </div>
             </div>
@@ -126,11 +197,18 @@
 
     <footer class="bg-stone-900 text-stone-400 py-12 text-center px-4">
         <div class="max-w-6xl mx-auto">
-            <p class="text-sm font-medium tracking-wide" data-t="footer_desc">Celebrando fe via e tradishon di koor Arubiano.</p>
+            <p class="text-sm font-medium tracking-wide" data-t="footer_desc">Celebrando fe via e tradishon di koor
+                Arubiano.</p>
             <div class="flex justify-center items-center gap-8 mt-8 mb-8">
-                <a href="#" target="_blank" class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i data-lucide="facebook" class="w-6 h-6"></i></a>
-                <a href="https://www.instagram.com/ahm_koor_dakota/" target="_blank" class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i data-lucide="instagram" class="w-6 h-6"></i></a>
-                <a href="#" target="_blank" class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i data-lucide="youtube" class="w-6 h-6"></i></a>
+                <a href="#" target="_blank"
+                    class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i data-lucide="facebook"
+                        class="w-6 h-6"></i></a>
+                <a href="https://www.instagram.com/ahm_koor_dakota/" target="_blank"
+                    class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i
+                        data-lucide="instagram" class="w-6 h-6"></i></a>
+                <a href="#" target="_blank"
+                    class="hover:text-emerald-500 hover:scale-110 transition-all duration-300"><i data-lucide="youtube"
+                        class="w-6 h-6"></i></a>
             </div>
             <div class="h-px w-16 bg-stone-800 mx-auto mb-6"></div>
             <p class="text-xs opacity-50">© 2024 Koor AHM Aruba</p>
@@ -141,4 +219,5 @@
     <script src="main.js"></script>
     <script> lucide.createIcons(); </script>
 </body>
+
 </html>

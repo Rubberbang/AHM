@@ -52,8 +52,19 @@ async function renderEvents() {
     const list = document.getElementById('events-list');
     if (!list) return;
 
+    // 1. Show Loader
+    list.innerHTML = `
+        <div class="loader-container">
+            <div class="spinner"></div>
+        </div>
+        <p class="text-center text-xs text-stone-400 mt-2">Cargando...</p>
+    `;
+
     try {
         const res = await fetch(`${API_BASE_URL}/events`);
+
+        // If the server was sleeping, this might take time.
+        // Once response comes:
         const events = await res.json();
 
         if (events.length === 0) {
@@ -63,7 +74,8 @@ async function renderEvents() {
 
         list.innerHTML = events.map(event => {
             const isCanceled = event.is_canceled === true;
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$?q=${encodeURIComponent(event.location)}`;
+
             return `
                 <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-stone-200 flex flex-col md:flex-row overflow-hidden transition-all ${isCanceled ? 'opacity-60 grayscale' : 'hover:shadow-md'}">
                     <div class="md:w-1/4 ${isCanceled ? 'bg-stone-500' : 'bg-emerald-900'} text-white p-6 md:p-8 flex flex-col items-center justify-center relative">
@@ -85,7 +97,7 @@ async function renderEvents() {
             `;
         }).join('');
     } catch (error) {
-        list.innerHTML = '<p class="text-center py-10 text-red-500">Error conectando cu servidor.</p>';
+        list.innerHTML = '<p class="text-center py-10 text-red-500">Error conectando cu servidor (Waking up server...). Refresh page please.</p>';
     }
 }
 
