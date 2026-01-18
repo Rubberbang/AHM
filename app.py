@@ -1,4 +1,5 @@
 import os
+import threading # NEW: Needed for background emails
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -12,13 +13,12 @@ app = Flask(__name__)
 
 # --- CONFIGURATION ---
 
-# SECURITY: Get from Render, fallback to a dummy string for local testing
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'local-secret-key-only')
 
-# CORS: Allow all origins (*) so your frontend can talk to this backend
+# CORS: Allow all origins
 CORS(app, supports_credentials=True, origins=["*"])
 
-# DATABASE: Handle Render's specific Postgres URL format
+# DATABASE
 db_url = os.environ.get('DATABASE_URL')
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -27,15 +27,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///choir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# MAIL: Settings for sending contact forms
+# MAIL SETTINGS
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+# Default sender
+app.config['MAIL_DEFAULT_SENDER'] = 'cayatapapia@gmail.com'
+
 mail = Mail(app)
 
-# ADMIN PASSWORD HASH
 ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
 # --- MODELS ---
@@ -58,23 +60,22 @@ class ContactMessage(db.Model):
     message = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-# Stores "Theme Color" settings
 class SiteContent(db.Model):
     key = db.Column(db.String(50), primary_key=True)
     value = db.Column(db.Text)
 
-# Stores News Posts with Images
 class NewsPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     date = db.Column(db.String(20))
     content = db.Column(db.Text)
-    image = db.Column(db.Text) # Stores Base64 Image String
+    image = db.Column(db.Text)
 
 with app.app_context():
     db.create_all()
 
-# --- SECURITY DECORATOR ---
+# --- HELPER FUNCTIONS ---
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -84,16 +85,24 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# NEW: Async Email Sender
+def send_async_email(app, msg):
+    with app.app_context():
+        try:
+            mail.send(msg)
+            print("Email sent successfully in background.")
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+
 # --- ROUTES ---
 
 @app.route('/')
 def health_check():
     try:
-        # This forces a tiny query to keep the DB connection alive
         db.session.execute(text('SELECT 1'))
-        return "AHM Backend & Database are Active!"
+        return "AHM Backend Active & DB Connected."
     except Exception as e:
-        return f"Backend Awake, but DB Error: {str(e)}"
+        return f"DB Error: {str(e)}"
 
 @app.route('/api/login', methods=['POST'], strict_slashes=False)
 def login():
@@ -102,8 +111,7 @@ def login():
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
 
-# --- EVENT ROUTES ---
-
+# --- EVENTS ---
 @app.route('/api/events', methods=['GET'], strict_slashes=False)
 def get_events():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -153,8 +161,7 @@ def manage_event(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
-# --- NEWS ROUTES ---
-
+# --- NEWS ---
 @app.route('/api/news', methods=['GET'], strict_slashes=False)
 def get_news():
     news = NewsPost.query.order_by(NewsPost.date.desc()).all()
@@ -169,7 +176,7 @@ def add_news():
     data = request.json
     new_post = NewsPost(
         title=data['title'], date=data['date'],
-        content=data['content'], image=data.get('image') # Image is Base64 string
+        content=data['content'], image=data.get('image')
     )
     db.session.add(new_post)
     db.session.commit()
@@ -183,8 +190,7 @@ def delete_news(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
-# --- SETTINGS / CONTENT ROUTES ---
-
+# --- SETTINGS ---
 @app.route('/api/content', methods=['GET'], strict_slashes=False)
 def get_content():
     content = SiteContent.query.all()
@@ -207,8 +213,7 @@ def save_content():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# --- CONTACT MESSAGES ---
-
+# --- MESSAGES & CONTACT ---
 @app.route('/api/admin/messages', methods=['GET'], strict_slashes=False)
 @login_required
 def get_messages():
@@ -227,6 +232,7 @@ def delete_message(id):
 def contact():
     data = request.json
     try:
+        # 1. Save to Database (Instant)
         new_msg = ContactMessage(
             name=data['name'], email=data['email'],
             company=data.get('company', ''), message=data['message']
@@ -234,20 +240,20 @@ def contact():
         db.session.add(new_msg)
         db.session.commit()
 
+        # 2. Send Email in Background Thread (Prevents Timeout/524)
         if app.config['MAIL_PASSWORD']:
-            try:
-                msg = Message(
-                    subject=f"AHM Website: {data['name']}",
-                    sender=app.config['MAIL_USERNAME'],
-                    recipients=['cayatapapia@gmail.com'],
-                    body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
-                )
-                mail.send(msg)
-            except Exception:
-                pass
+            msg = Message(
+                subject=f"AHM Website: {data['name']}",
+                recipients=['cayatapapia@gmail.com'],
+                body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
+            )
+            # Start thread
+            threading.Thread(target=send_async_email, args=(app, msg)).start()
 
         return jsonify({"status": "success", "message": "Mensahe a drenta"}), 200
+
     except Exception as e:
+        print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
