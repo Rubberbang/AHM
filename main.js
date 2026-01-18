@@ -30,30 +30,22 @@ function renderReflection() {
     }
 }
 
-// NEW: Fetch Custom Content (Hero, Mission, History) from Admin Settings
-async function loadSiteContent() {
+// NEW: Check Database for Theme Color Update
+async function checkThemeColor() {
     try {
         const res = await fetch(`${API_BASE_URL}/content`);
         if (!res.ok) return;
         const data = await res.json();
 
-        // Helper to safely set text if element exists
-        const setText = (id, text) => {
-            const el = document.getElementById(id);
-            // Only override if the admin actually saved text for this spot
-            if (el && text) el.innerText = text;
-        };
-
-        // These IDs must match the ID's in your index.html (I added them in the previous step)
-        // If index.html uses data-t (translations), this will OVERRIDE it if content exists.
-        setText('hero-title-text', data.hero_title);
-        setText('hero-subtitle-text', data.hero_subtitle);
-
-        // Note: You might need to add specific IDs to your HTML tags for this to work perfectly
-        // e.g. <h3 id="mission-1-text">...</h3>
-    } catch (e) {
-        console.log("Using default content");
-    }
+        if (data.theme_color) {
+            const current = localStorage.getItem('theme_color');
+            if (current !== data.theme_color) {
+                // If DB is different from Browser, update and refresh to apply
+                localStorage.setItem('theme_color', data.theme_color);
+                location.reload();
+            }
+        }
+    } catch (e) { console.log("Theme check failed"); }
 }
 
 async function renderEvents() {
@@ -71,9 +63,7 @@ async function renderEvents() {
 
         list.innerHTML = events.map(event => {
             const isCanceled = event.is_canceled === true;
-            // Updated Maps Link logic
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
-
             return `
                 <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-sm border border-stone-200 flex flex-col md:flex-row overflow-hidden transition-all ${isCanceled ? 'opacity-60 grayscale' : 'hover:shadow-md'}">
                     <div class="md:w-1/4 ${isCanceled ? 'bg-stone-500' : 'bg-emerald-900'} text-white p-6 md:p-8 flex flex-col items-center justify-center relative">
@@ -110,7 +100,6 @@ if (contactForm) {
             company: document.getElementById('contact-company') ? document.getElementById('contact-company').value : '',
             message: document.getElementById('contact-message').value
         };
-
         try {
             btn.innerText = "Mandando...";
             btn.disabled = true;
@@ -138,13 +127,11 @@ window.onload = async () => {
             if (document.getElementById('events-list')) renderEvents();
         });
     });
-
     updateLanguage(currentLang);
     lucide.createIcons();
     renderReflection();
 
-    // Load dynamic content (Hero text etc)
-    loadSiteContent();
+    checkThemeColor(); // Added here
 
     if (document.getElementById('events-list')) await renderEvents();
 };
