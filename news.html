@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noticia y Actividadnan - AHM Koor Aruba</title>
 
+    <link rel="icon" type="image/png" sizes="192x192" href="images/logo.png">
+    <link rel="apple-touch-icon" href="images/logo.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-2-32x32.png">
+    <link rel="icon" size="48x48" href="/favicon.ico">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         const THEMES = {
@@ -104,10 +110,10 @@
     <script src="data.js"></script>
     <script>
         const API_BASE = "https://api.ahmkoor.com/api";
-        
+
         async function loadNews() {
             const container = document.getElementById('news-container');
-            
+
             // 1. Show Loader
             container.innerHTML = `
                 <div class="col-span-2 flex flex-col items-center justify-center py-12">
@@ -119,7 +125,7 @@
             try {
                 const res = await fetch(`${API_BASE}/news`);
                 const news = await res.json();
-                
+
                 if (news.length === 0) {
                     container.innerHTML = '<p class="col-span-2 text-center text-stone-400 py-10">Ainda no tin noticia.</p>';
                     return;
@@ -135,8 +141,8 @@
                         </div>
                     </div>
                 `).join('');
-            } catch (e) { 
-                console.error(e); 
+            } catch (e) {
+                console.error(e);
                 container.innerHTML = '<p class="col-span-2 text-center text-red-400 py-10">Server is waking up. Please refresh in a moment.</p>';
             }
         }
