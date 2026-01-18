@@ -6,6 +6,7 @@ from flask_mail import Mail, Message
 from functools import wraps
 from datetime import datetime
 from werkzeug.security import check_password_hash
+from sqlalchemy import text
 
 app = Flask(__name__)
 
@@ -87,7 +88,12 @@ def login_required(f):
 
 @app.route('/')
 def health_check():
-    return "AHM Backend is Running Successfully!"
+    try:
+        # This forces a tiny query to keep the DB connection alive
+        db.session.execute(text('SELECT 1'))
+        return "AHM Backend & Database are Active!"
+    except Exception as e:
+        return f"Backend Awake, but DB Error: {str(e)}"
 
 @app.route('/api/login', methods=['POST'], strict_slashes=False)
 def login():
