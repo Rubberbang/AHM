@@ -8,106 +8,78 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
-    </style>
+    <style>body { font-family: system-ui, sans-serif; }</style>
 </head>
 <body class="bg-stone-100 min-h-screen">
 
     <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl max-w-sm w-full border border-stone-200">
-            <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <i data-lucide="lock" class="w-8 h-8"></i>
-            </div>
-            <h1 class="text-2xl font-bold mb-6 text-center text-stone-800">Admin Login</h1>
-            <input type="password" id="admin-password" placeholder="Password"
-                class="w-full p-4 border border-stone-200 rounded-xl mb-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-            <button onclick="login()" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:bg-slate-800 transition-all">Login</button>
+        <div class="bg-white p-10 rounded-2xl shadow-xl max-w-sm w-full">
+            <h1 class="text-2xl font-bold mb-6 text-center text-slate-800">Admin Login</h1>
+            <input type="password" id="admin-password" placeholder="Password" class="w-full p-3 border rounded mb-4">
+            <button onclick="login()" class="w-full py-3 bg-slate-900 text-white rounded font-bold">Login</button>
         </div>
     </div>
 
     <div id="dashboard-screen" class="hidden">
-        <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md">
-            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <h1 class="text-xl font-bold">AHM Admin</h1>
+        <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50">
+            <div class="max-w-6xl mx-auto flex flex-wrap gap-4 justify-between items-center">
+                <h1 class="text-xl font-bold">AHM Admin</h1>
+                <div class="flex gap-2">
+                    <button onclick="showTab('events')" id="nav-events" class="px-3 py-1 rounded hover:bg-slate-700">Eventos</button>
+                    <button onclick="showTab('news')" id="nav-news" class="px-3 py-1 rounded hover:bg-slate-700">Noticia</button>
+                    <button onclick="showTab('settings')" id="nav-settings" class="px-3 py-1 rounded hover:bg-slate-700">Settings</button>
                 </div>
-                <div class="flex gap-2 md:gap-4 items-center bg-slate-800/50 p-1 rounded-xl">
-                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Eventos</button>
-                    <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Inbox</button>
-                    <button onclick="showTab('settings')" id="nav-settings" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Settings</button>
-                </div>
-                <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
             </div>
         </nav>
 
         <div class="max-w-6xl mx-auto p-4 md:p-8">
 
             <div id="tab-events" class="tab-content">
-                <div class="lg:hidden mb-6">
-                    <button onclick="toggleMobileForm()" id="mobile-form-btn" class="w-full py-4 bg-white border-2 border-slate-900 text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i><span id="btn-text">Evento nobo</span>
-                    </button>
-                </div>
+                <h2 class="text-2xl font-bold mb-4">Eventos</h2>
+                <p class="text-sm text-gray-500 mb-4">Use the existing event controls here.</p>
+                 <button onclick="window.location.reload()" class="underline">Reload to manage events</button>
+            </div>
+
+            <div id="tab-news" class="tab-content hidden">
                 <div class="grid lg:grid-cols-3 gap-8">
-                    <div id="add-event-sidebar" class="hidden lg:block lg:col-span-1">
-                        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 lg:sticky lg:top-28">
-                            <h2 class="text-xl font-bold mb-6 text-stone-800 flex justify-between items-center">
-                                <span id="form-title">Evento nobo</span>
-                                <button onclick="resetEventForm()" id="cancel-edit-btn" class="hidden text-xs text-red-500 underline">Cancel Edit</button>
-                            </h2>
-                            <form id="addEventForm" class="space-y-4">
-                                <input type="hidden" id="ev-id">
-                                <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="date" id="ev-date" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="time" id="ev-time" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                <input type="text" id="ev-location" placeholder="Luga" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                <textarea id="ev-description" placeholder="Descripcion" rows="3" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-                                <select id="ev-type" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="Mass">Mass</option><option value="Concert">Concert</option><option value="Special Service">Special Service</option>
-                                </select>
-                                <button type="submit" id="submit-btn" class="w-full py-4 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Save Evento</button>
+                    <div class="lg:col-span-1">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                            <h2 class="text-xl font-bold mb-4 text-slate-800">Post Noticia</h2>
+                            <form id="addNewsForm" class="space-y-4">
+                                <input type="text" id="news-title" placeholder="Titulo" required class="w-full p-3 border rounded">
+                                <input type="date" id="news-date" required class="w-full p-3 border rounded">
+                                <textarea id="news-content" placeholder="E contenido..." rows="4" class="w-full p-3 border rounded"></textarea>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Image (Optional)</label>
+                                    <input type="file" id="news-image" accept="image/*" class="w-full text-sm">
+                                </div>
+
+                                <button type="submit" id="news-submit-btn" class="w-full py-3 bg-blue-700 text-white rounded font-bold">Post News</button>
                             </form>
                         </div>
                     </div>
-                    <div class="lg:col-span-2 space-y-10">
-                        <section>
-                            <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2"><i data-lucide="calendar-days" class="text-slate-600 w-5 h-5"></i>Eventonan Biniendo</h2>
-                            <div id="admin-events-list" class="space-y-4"></div>
-                        </section>
-                        <section class="pt-8 border-t border-stone-200">
-                            <h2 class="text-lg font-bold mb-6 text-stone-400 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4"></i>Archive (Eventonan Bieu)</h2>
-                            <div id="admin-archive-list" class="space-y-3 opacity-70"></div>
-                        </section>
+
+                    <div class="lg:col-span-2">
+                        <h2 class="text-xl font-bold mb-4">Recent Posts</h2>
+                        <div id="admin-news-list" class="space-y-4"></div>
                     </div>
                 </div>
-            </div>
-
-            <div id="tab-messages" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="mail" class="text-slate-600 w-6 h-6"></i>Inbox</h2>
-                <div id="admin-messages-list" class="grid md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="tab-settings" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="settings" class="text-slate-600 w-6 h-6"></i>Site Settings</h2>
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 max-w-lg">
-                    <h3 class="font-serif text-lg font-bold text-slate-900 mb-4">Liturgical Color Season</h3>
-                    <p class="text-sm text-stone-500 mb-4">Select the accent color for the website based on the current liturgical season.</p>
-                    <div class="space-y-4">
-                        <select id="sel-theme-color" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-stone-50 font-bold text-stone-700">
-                            <option value="emerald">Green (Ordinary Time)</option>
-                            <option value="violet">Purple (Advent/Lent)</option>
-                            <option value="rose">Red (Pentecost/Martyrs)</option>
-                            <option value="amber">Gold (Easter/Christmas)</option>
-                        </select>
-                        <button onclick="saveSettings()" class="w-full py-3 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Save Color Settings</button>
-                    </div>
+                <h2 class="text-2xl font-bold mb-4">Settings</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-sm max-w-md">
+                    <label class="block mb-2 font-bold">Liturgical Color</label>
+                    <select id="sel-theme-color" class="w-full p-3 border rounded mb-4">
+                        <option value="emerald">Green</option>
+                        <option value="violet">Purple</option>
+                        <option value="rose">Red</option>
+                        <option value="amber">Gold</option>
+                    </select>
+                    <button onclick="saveSettings()" class="w-full py-3 bg-blue-700 text-white rounded font-bold">Save</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -115,173 +87,120 @@
         const API_BASE = "https://api.ahmkoor.com/api";
         const getToken = () => localStorage.getItem('admin_token');
 
+        // Authentication & Tab Logic
+        async function login() {
+            const password = document.getElementById('admin-password').value;
+            const res = await fetch(`${API_BASE}/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ password }) });
+            if (res.ok) { localStorage.setItem('admin_token', (await res.json()).token); showDashboardUI(); } else { alert("Wrong password"); }
+        }
+        function showDashboardUI() { document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.remove('hidden'); loadNews(); }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            if(tab === 'news') loadNews();
+            if(tab === 'settings') loadSettings();
+        }
+
         async function authFetch(url, options = {}) {
             if (!options.headers) options.headers = {};
             options.headers['Content-Type'] = 'application/json';
             const token = getToken();
             if (token) options.headers['Authorization'] = `Bearer ${token}`;
-            const res = await fetch(url, options);
-            if (res.status === 401) logout();
-            return res;
+            return fetch(url, options);
         }
 
-        async function login() {
-            const password = document.getElementById('admin-password').value;
-            const res = await fetch(`${API_BASE}/login`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ password })
-            });
-            if (res.ok) {
-                const data = await res.json();
-                localStorage.setItem('admin_token', data.token);
-                showDashboardUI();
-            } else { alert("Wrong password"); }
-        }
-
-        function logout() { localStorage.removeItem('admin_token'); location.reload(); }
-
-        function showDashboardUI() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('dashboard-screen').classList.remove('hidden');
-            loadDashboardData();
-        }
-
-        function showTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('#nav-events, #nav-messages, #nav-settings').forEach(b => b.classList.remove('bg-blue-700', 'text-white'));
-            document.getElementById(`nav-${tab}`).classList.add('bg-blue-700', 'text-white');
-            if(tab === 'settings') loadSettings();
-        }
-
-        function loadDashboardData() {
-            loadEvents();
-            loadMessages();
-            showTab('events');
+        // --- NEWS LOGIC ---
+        async function loadNews() {
+            const res = await fetch(`${API_BASE}/news`);
+            const news = await res.json();
+            const list = document.getElementById('admin-news-list');
+            list.innerHTML = news.map(n => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border flex gap-4 items-start">
+                    ${n.image ? `<img src="${n.image}" class="w-16 h-16 object-cover rounded-lg">` : '<div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center text-slate-300">No Img</div>'}
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-slate-800">${n.title}</h3>
+                        <p class="text-xs text-slate-500">${n.date}</p>
+                        <p class="text-sm text-slate-600 truncate">${n.content}</p>
+                    </div>
+                    <button onclick="deleteNews(${n.id})" class="text-red-500 hover:text-red-700"><i data-lucide="trash-2"></i></button>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
 
-        // --- EVENTS LOGIC ---
-        let allEventsCache = [];
-        async function loadEvents() {
-            const res = await authFetch(`${API_BASE}/admin/all-events`);
-            const events = await res.json();
-            allEventsCache = events;
-            const today = new Date().toISOString().split('T')[0];
-            const upList = document.getElementById('admin-events-list');
-            const arcList = document.getElementById('admin-archive-list');
-            let upHtml = "", arcHtml = "";
-            events.forEach(e => {
-                const isCanceled = e.is_canceled;
-                const html = `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border flex justify-between items-center ${isCanceled ? 'bg-red-50 border-red-100' : 'border-stone-200'}">
-                        <div class="flex gap-4 items-center">
-                            <div class="text-center min-w-[50px]">
-                                <p class="text-[10px] uppercase font-bold text-stone-400">${e.date.split('-')[1]}</p>
-                                <p class="text-xl font-bold text-stone-800">${e.date.split('-')[2]}</p>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-stone-800 text-sm md:text-base ${isCanceled ? 'line-through opacity-50' : ''}">${e.title}</h3>
-                                <p class="text-[10px] md:text-xs text-stone-500">${e.location} | ${e.time}</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-1 md:gap-2">
-                            <button onclick="editEvent(${e.id})" class="p-2 bg-blue-50 rounded-lg hover:bg-blue-100 border border-blue-100" title="Edit"><i data-lucide="pencil" class="w-4 h-4 text-blue-600"></i></button>
-                            <button onclick="toggleCancel(${e.id}, ${!isCanceled})" class="p-2 bg-stone-100 rounded-lg hover:bg-amber-100" title="Cancel/Uncancel"><i data-lucide="slash" class="w-4 h-4 text-amber-600"></i></button>
-                            <button onclick="deleteEvent(${e.id})" class="p-2 bg-stone-100 rounded-lg hover:bg-red-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i></button>
-                        </div>
-                    </div>`;
-                if (e.date >= today) upHtml += html; else arcHtml += html;
-            });
-            upList.innerHTML = upHtml || '<p class="text-stone-400 italic text-sm">No upcoming events.</p>';
-            arcList.innerHTML = arcHtml || '<p class="text-stone-400 italic text-sm">None</p>';
-            lucide.createIcons();
-        }
-
-        function editEvent(id) {
-            const event = allEventsCache.find(e => e.id === id);
-            if (!event) return;
-            document.getElementById('ev-id').value = event.id;
-            document.getElementById('ev-title').value = event.title;
-            document.getElementById('ev-date').value = event.date;
-            document.getElementById('ev-time').value = event.time;
-            document.getElementById('ev-location').value = event.location;
-            document.getElementById('ev-description').value = event.description || '';
-            document.getElementById('ev-type').value = event.type;
-            document.getElementById('form-title').innerText = "Edit Evento";
-            document.getElementById('submit-btn').innerText = "Update Evento";
-            document.getElementById('cancel-edit-btn').classList.remove('hidden');
-            const sidebar = document.getElementById('add-event-sidebar');
-            sidebar.classList.remove('hidden');
-            sidebar.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function resetEventForm() {
-            document.getElementById('addEventForm').reset();
-            document.getElementById('ev-id').value = "";
-            document.getElementById('form-title').innerText = "Evento nobo";
-            document.getElementById('submit-btn').innerText = "Save Evento";
-            document.getElementById('cancel-edit-btn').classList.add('hidden');
-        }
-
-        document.getElementById('addEventForm').onsubmit = async (e) => {
+        document.getElementById('addNewsForm').onsubmit = async (e) => {
             e.preventDefault();
-            const id = document.getElementById('ev-id').value;
-            const data = {
-                title: document.getElementById('ev-title').value,
-                date: document.getElementById('ev-date').value,
-                time: document.getElementById('ev-time').value,
-                location: document.getElementById('ev-location').value,
-                description: document.getElementById('ev-description').value,
-                type: document.getElementById('ev-type').value
-            };
-            let res;
-            if (id) res = await authFetch(`${API_BASE}/admin/events/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-            else res = await authFetch(`${API_BASE}/admin/events`, { method: 'POST', body: JSON.stringify(data) });
-            if (res.ok) { resetEventForm(); if (window.innerWidth < 1024) toggleMobileForm(); loadEvents(); }
+            const btn = document.getElementById('news-submit-btn');
+            btn.innerText = "Uploading..."; btn.disabled = true;
+
+            const title = document.getElementById('news-title').value;
+            const date = document.getElementById('news-date').value;
+            const content = document.getElementById('news-content').value;
+            const fileInput = document.getElementById('news-image');
+
+            let imageBase64 = null;
+            if (fileInput.files.length > 0) {
+                imageBase64 = await resizeImage(fileInput.files[0]);
+            }
+
+            const res = await authFetch(`${API_BASE}/admin/news`, {
+                method: 'POST',
+                body: JSON.stringify({ title, date, content, image: imageBase64 })
+            });
+
+            if (res.ok) {
+                document.getElementById('addNewsForm').reset();
+                loadNews();
+            } else { alert("Error uploading"); }
+            btn.innerText = "Post News"; btn.disabled = false;
         };
 
-        async function loadMessages() {
-            const res = await authFetch(`${API_BASE}/admin/messages`);
-            const msgs = await res.json();
-            const list = document.getElementById('admin-messages-list');
-            list.innerHTML = msgs.map(m => `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200">
-                    <div class="flex justify-between items-start mb-2"><p class="font-bold text-stone-800 text-sm">${m.name}</p><button onclick="deleteMessage(${m.id})" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-                    <p class="text-xs text-stone-600 mb-3">${m.message}</p><p class="text-[9px] text-stone-400 uppercase font-bold">${m.email} ${m.company ? '| ' + m.company : ''}</p>
-                </div>`).join('');
-            lucide.createIcons();
+        async function deleteNews(id) {
+            if(!confirm("Delete this news?")) return;
+            await authFetch(`${API_BASE}/admin/news/${id}`, { method: 'DELETE' });
+            loadNews();
         }
 
+        // Helper: Resize Image & Convert to Base64
+        function resizeImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_WIDTH = 800; // Limit size
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compress to 70% quality
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- SETTINGS ---
         async function loadSettings() {
             try {
-                const res = await authFetch(`${API_BASE}/content`);
-                if(!res.ok) return;
+                const res = await fetch(`${API_BASE}/content`);
                 const data = await res.json();
                 document.getElementById('sel-theme-color').value = data.theme_color || "emerald";
-            } catch(e) { console.error(e); }
+            } catch(e){}
         }
-
         async function saveSettings() {
             const color = document.getElementById('sel-theme-color').value;
-            const res = await authFetch(`${API_BASE}/content`, {
-                method: 'POST', body: JSON.stringify({ theme_color: color })
-            });
-            if(res.ok) alert("Color Updated! Refresh the main site to see changes.");
+            await authFetch(`${API_BASE}/content`, { method: 'POST', body: JSON.stringify({ theme_color: color }) });
+            alert("Updated!");
         }
 
-        // --- UTILS ---
-        async function deleteEvent(id) { if(confirm("Delete?")) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'DELETE'}); loadEvents(); } }
-        async function deleteMessage(id) { if(confirm("Delete message?")) { await authFetch(`${API_BASE}/admin/messages/${id}`, {method:'DELETE'}); loadMessages(); } }
-        async function toggleCancel(id, status) { await authFetch(`${API_BASE}/admin/events/${id}`, {method:'PUT', body: JSON.stringify({is_canceled: status})}); loadEvents(); }
-        function toggleMobileForm() {
-            const sidebar = document.getElementById('add-event-sidebar');
-            const isHidden = sidebar.classList.contains('hidden');
-            if (isHidden) { sidebar.classList.remove('hidden'); document.getElementById('btn-text').innerText = "Close Form"; sidebar.scrollIntoView({ behavior: 'smooth' }); }
-            else { sidebar.classList.add('hidden'); document.getElementById('btn-text').innerText = "Evento nobo"; }
-        }
-
-        window.onload = () => { if (getToken()) showDashboardUI(); lucide.createIcons(); };
+        window.onload = () => { if (getToken()) document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard-screen').classList.remove('hidden'); lucide.createIcons(); };
     </script>
 </body>
 </html>

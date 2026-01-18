@@ -9,13 +9,15 @@ from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
 
+# --- CONFIGURATION ---
+
 # SECURITY: Get from Render, fallback to a dummy string for local testing
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'local-secret-key-only')
 
-# CORS Configuration
-CORS(app, supports_credentials=True, origins=["*"]) # Allow all origins for simplicity in this setup
+# CORS: Allow all origins (*) so your frontend can talk to this backend
+CORS(app, supports_credentials=True, origins=["*"])
 
-# DATABASE CONFIG
+# DATABASE: Handle Render's specific Postgres URL format
 db_url = os.environ.get('DATABASE_URL')
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -24,7 +26,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///choir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# MAIL CONFIG
+# MAIL: Settings for sending contact forms
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -32,6 +34,7 @@ app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 mail = Mail(app)
 
+# ADMIN PASSWORD HASH
 ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
 # --- MODELS ---
@@ -54,10 +57,18 @@ class ContactMessage(db.Model):
     message = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-# Key-Value store for settings (like theme_color)
+# Stores "Theme Color" settings
 class SiteContent(db.Model):
     key = db.Column(db.String(50), primary_key=True)
     value = db.Column(db.Text)
+
+# Stores News Posts with Images
+class NewsPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.String(20))
+    content = db.Column(db.Text)
+    image = db.Column(db.Text) # Stores Base64 Image String
 
 with app.app_context():
     db.create_all()
@@ -84,6 +95,8 @@ def login():
     if ADMIN_HASH != 'no-hash-provided' and check_password_hash(ADMIN_HASH, data.get('password')):
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
+
+# --- EVENT ROUTES ---
 
 @app.route('/api/events', methods=['GET'], strict_slashes=False)
 def get_events():
@@ -134,17 +147,33 @@ def manage_event(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
-@app.route('/api/admin/messages', methods=['GET'], strict_slashes=False)
-@login_required
-def get_messages():
-    msgs = ContactMessage.query.order_by(ContactMessage.timestamp.desc()).all()
-    return jsonify([{'id': m.id, 'name': m.name, 'email': m.email, 'company': m.company, 'message': m.message} for m in msgs])
+# --- NEWS ROUTES ---
 
-@app.route('/api/admin/messages/<int:id>', methods=['DELETE'], strict_slashes=False)
+@app.route('/api/news', methods=['GET'], strict_slashes=False)
+def get_news():
+    news = NewsPost.query.order_by(NewsPost.date.desc()).all()
+    return jsonify([{
+        'id': n.id, 'title': n.title, 'date': n.date,
+        'content': n.content, 'image': n.image
+    } for n in news])
+
+@app.route('/api/admin/news', methods=['POST'], strict_slashes=False)
 @login_required
-def delete_message(id):
-    msg = ContactMessage.query.get_or_404(id)
-    db.session.delete(msg)
+def add_news():
+    data = request.json
+    new_post = NewsPost(
+        title=data['title'], date=data['date'],
+        content=data['content'], image=data.get('image') # Image is Base64 string
+    )
+    db.session.add(new_post)
+    db.session.commit()
+    return jsonify({"status": "success"})
+
+@app.route('/api/admin/news/<int:id>', methods=['DELETE'], strict_slashes=False)
+@login_required
+def delete_news(id):
+    post = NewsPost.query.get_or_404(id)
+    db.session.delete(post)
     db.session.commit()
     return jsonify({"status": "success"})
 
@@ -172,6 +201,22 @@ def save_content():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+# --- CONTACT MESSAGES ---
+
+@app.route('/api/admin/messages', methods=['GET'], strict_slashes=False)
+@login_required
+def get_messages():
+    msgs = ContactMessage.query.order_by(ContactMessage.timestamp.desc()).all()
+    return jsonify([{'id': m.id, 'name': m.name, 'email': m.email, 'company': m.company, 'message': m.message} for m in msgs])
+
+@app.route('/api/admin/messages/<int:id>', methods=['DELETE'], strict_slashes=False)
+@login_required
+def delete_message(id):
+    msg = ContactMessage.query.get_or_404(id)
+    db.session.delete(msg)
+    db.session.commit()
+    return jsonify({"status": "success"})
+
 @app.route('/api/contact', methods=['POST'], strict_slashes=False)
 def contact():
     data = request.json
@@ -189,7 +234,7 @@ def contact():
                     subject=f"AHM Website: {data['name']}",
                     sender=app.config['MAIL_USERNAME'],
                     recipients=['cayatapapia@gmail.com'],
-                    body=f"Name: {data['name']}\nEmail: {data['email']}\n\nMessage:\n{data['message']}"
+                    body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
                 )
                 mail.send(msg)
             except Exception:
