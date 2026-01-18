@@ -27,13 +27,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///choir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# MAIL SETTINGS
+# MAIL CONFIG
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_PORT'] = 465             # CHANGED: 587 -> 465
+app.config['MAIL_USE_TLS'] = False        # CHANGED: True -> False
+app.config['MAIL_USE_SSL'] = True         # CHANGED: False -> True
 app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-# Default sender
 app.config['MAIL_DEFAULT_SENDER'] = 'cayatapapia@gmail.com'
 
 mail = Mail(app)
