@@ -85,14 +85,14 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# NEW: Async Email Sender
 def send_async_email(app, msg):
     with app.app_context():
         try:
             mail.send(msg)
-            print("Email sent successfully in background.")
+            print(f"✅ EMAIL SUCCESS: Sent to {msg.recipients}", flush=True)
         except Exception as e:
-            print(f"Failed to send email: {e}")
+            # This will print the exact error from Google to your Render logs
+            print(f"❌ EMAIL FAILED: {str(e)}", flush=True)
 
 # --- ROUTES ---
 
@@ -232,7 +232,7 @@ def delete_message(id):
 def contact():
     data = request.json
     try:
-        # 1. Save to Database (Instant)
+        # 1. Save to Database
         new_msg = ContactMessage(
             name=data['name'], email=data['email'],
             company=data.get('company', ''), message=data['message']
@@ -240,15 +240,19 @@ def contact():
         db.session.add(new_msg)
         db.session.commit()
 
-        # 2. Send Email in Background Thread (Prevents Timeout/524)
+        # 2. Prepare Email
         if app.config['MAIL_PASSWORD']:
             msg = Message(
                 subject=f"AHM Website: {data['name']}",
+                # IMPORTANT: Sender must match your MAIL_USERNAME exactly
+                sender=app.config['MAIL_USERNAME'],
                 recipients=['cayatapapia@gmail.com'],
                 body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
             )
-            # Start thread
+            # Start background thread
             threading.Thread(target=send_async_email, args=(app, msg)).start()
+        else:
+            print("⚠️ Email skipped: MAIL_PASSWORD not set in environment.")
 
         return jsonify({"status": "success", "message": "Mensahe a drenta"}), 200
 
