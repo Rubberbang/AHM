@@ -59,7 +59,7 @@
                     <h1 class="text-xl font-bold">AHM Admin</h1>
                 </div>
                 <div class="flex gap-2 md:gap-4 items-center bg-slate-800/50 p-1 rounded-xl">
-                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Eventos</button>
+                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Evento</button>
                     <button onclick="showTab('news')" id="nav-news" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Noticia</button>
                     <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Inbox</button>
                     <button onclick="showTab('settings')" id="nav-settings" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Settings</button>
@@ -81,7 +81,7 @@
                         <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 lg:sticky lg:top-28">
                             <h2 class="text-xl font-bold mb-6 text-stone-800 flex justify-between items-center">
                                 <span id="form-title">Evento nobo</span>
-                                <button onclick="resetEventForm()" id="cancel-edit-btn" class="hidden text-xs text-red-500 underline">Cancel Edit</button>
+                                <button onclick="resetEventForm()" id="cancel-edit-btn" class="hidden text-xs text-red-500 underline">Cancela Edit</button>
                             </h2>
                             <form id="addEventForm" class="space-y-4">
                                 <input type="hidden" id="ev-id">
@@ -121,17 +121,17 @@
                                 <textarea id="news-content" placeholder="E contenido..." rows="4" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 mb-1">Image (Optional)</label>
+                                    <label class="block text-xs font-bold text-slate-500 mb-1">Image (Opcional)</label>
                                     <input type="file" id="news-image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                                 </div>
 
-                                <button type="submit" id="news-submit-btn" class="w-full py-4 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Post News</button>
+                                <button type="submit" id="news-submit-btn" class="w-full py-4 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Post Noticia</button>
                             </form>
                         </div>
                     </div>
 
                     <div class="lg:col-span-2">
-                        <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2"><i data-lucide="newspaper" class="text-slate-600 w-5 h-5"></i>Recent Posts</h2>
+                        <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2"><i data-lucide="newspaper" class="text-slate-600 w-5 h-5"></i>Posts Recien</h2>
                         <div id="admin-news-list" class="space-y-4"></div>
                     </div>
                 </div>
@@ -143,16 +143,16 @@
             </div>
 
             <div id="tab-settings" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="settings" class="text-slate-600 w-6 h-6"></i>Site Settings</h2>
+                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="settings" class="text-slate-600 w-6 h-6"></i>Website Settings</h2>
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 max-w-lg">
-                    <h3 class="font-serif text-lg font-bold text-slate-900 mb-4">Liturgical Color Season</h3>
-                    <p class="text-sm text-stone-500 mb-4">Select the accent color for the website based on the current liturgical season.</p>
+                    <h3 class="font-serif text-lg font-bold text-slate-900 mb-4">Color Liturgia</h3>
+                    <p class="text-sm text-stone-500 mb-4">Scohe e color di e website.</p>
                     <div class="space-y-4">
                         <select id="sel-theme-color" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-stone-50 font-bold text-stone-700">
-                            <option value="emerald">Green (Ordinary Time)</option>
-                            <option value="violet">Purple (Advent/Lent)</option>
-                            <option value="rose">Red (Pentecost/Martyrs)</option>
-                            <option value="amber">Gold (Easter/Christmas)</option>
+                            <option value="emerald">Berde 💚 (Default)</option>
+                            <option value="violet">Biña 💜 (Advent/Lent)</option>
+                            <option value="rose">Cora ❤️ (Pentecost/Martyrs)</option>
+                            <option value="amber">Oro 💛 (Easter/Christmas)</option>
                         </select>
                         <button onclick="saveSettings()" class="w-full py-3 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Save Color Settings</button>
                     </div>
