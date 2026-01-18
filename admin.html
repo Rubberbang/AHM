@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>AHM Admin Dashboard</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-2-32x32.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@
             width: 40px;
             height: 40px;
             border: 4px solid #e5e5e5;
-            border-top: 4px solid #1e293b; /* Slate-800 to match Admin theme */
+            border-top: 4px solid #1e293b; /* Slate-800 */
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -61,7 +61,12 @@
                 <div class="flex gap-2 md:gap-4 items-center bg-slate-800/50 p-1 rounded-xl">
                     <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Evento</button>
                     <button onclick="showTab('news')" id="nav-news" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Noticia</button>
-                    <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Inbox</button>
+
+                    <button onclick="showTab('messages')" id="nav-messages" class="relative px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all flex items-center gap-2">
+                        Inbox
+                        <span id="msg-badge" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm animate-pulse">0</span>
+                    </button>
+
                     <button onclick="showTab('settings')" id="nav-settings" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Settings</button>
                 </div>
                 <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
@@ -207,21 +212,84 @@
         }
 
         function loadDashboardData() {
+            // Load messages first so the notification badge updates immediately
+            loadMessages();
             loadEvents();
             loadNews();
-            loadMessages();
             showTab('events'); // Default
             lucide.createIcons();
+        }
+
+        // --- MESSAGES (Updated for Notifications & Reply) ---
+        async function loadMessages() {
+            const list = document.getElementById('admin-messages-list');
+
+            // Only show spinner if list is currently empty to avoid flickering on reloads
+            if(list.innerHTML === "") {
+                list.innerHTML = `<div class="col-span-2 loader-container"><div class="spinner"></div></div>`;
+            }
+
+            try {
+                const res = await authFetch(`${API_BASE}/admin/messages`);
+                const msgs = await res.json();
+
+                // 1. UPDATE NOTIFICATION BADGE
+                const badge = document.getElementById('msg-badge');
+                if(msgs.length > 0) {
+                    badge.innerText = msgs.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+
+                // 2. RENDER MESSAGES WITH REPLY BUTTON
+                if (msgs.length === 0) {
+                     list.innerHTML = `<p class="col-span-2 text-center text-stone-400 italic">No messages.</p>`;
+                } else {
+                    list.innerHTML = msgs.map(m => `
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200 flex flex-col justify-between h-full">
+                            <div>
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="font-bold text-stone-800 text-sm">${m.name}</h3>
+                                    <span class="text-[10px] text-stone-400 font-mono">${new Date(m.timestamp || Date.now()).toLocaleDateString()}</span>
+                                </div>
+                                <p class="text-[10px] text-stone-400 uppercase font-bold mb-3 tracking-wider">
+                                    ${m.email} ${m.company ? '| ' + m.company : ''}
+                                </p>
+                                <div class="bg-stone-50 p-3 rounded-xl mb-4 text-xs text-stone-600 italic border border-stone-100">
+                                    "${m.message}"
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2 mt-2 pt-3 border-t border-stone-100">
+                                <a href="mailto:${m.email}?subject=Re: AHM Website Contact: ${m.name}"
+                                   class="flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 hover:bg-blue-100 py-2 rounded-lg text-xs font-bold transition-colors">
+                                   <i data-lucide="reply" class="w-3 h-3"></i> Reply
+                                </a>
+                                <button onclick="deleteMessage(${m.id})"
+                                        class="p-2 bg-stone-50 text-red-400 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors" title="Delete">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>`).join('');
+                }
+                lucide.createIcons();
+            } catch(e) { console.error(e); }
+        }
+
+        async function deleteMessage(id) {
+            if(confirm("Delete message?")) {
+                await authFetch(`${API_BASE}/admin/messages/${id}`, {method:'DELETE'});
+                loadMessages(); // Reloads list AND updates badge count
+            }
         }
 
         // --- EVENTS ---
         let allEventsCache = [];
         async function loadEvents() {
             const upList = document.getElementById('admin-events-list');
-            
-            // 1. SHOW LOADING ANIMATION
-            upList.innerHTML = `<div class="loader-container"><div class="spinner"></div></div>`;
-            
+            if(upList.innerHTML === "") upList.innerHTML = `<div class="loader-container"><div class="spinner"></div></div>`;
+
             try {
                 const res = await authFetch(`${API_BASE}/admin/all-events`);
                 const events = await res.json();
@@ -303,14 +371,12 @@
         // --- NEWS ---
         async function loadNews() {
             const list = document.getElementById('admin-news-list');
-            
-            // 1. SHOW LOADING ANIMATION
-            list.innerHTML = `<div class="loader-container"><div class="spinner"></div></div>`;
-            
+            if(list.innerHTML === "") list.innerHTML = `<div class="loader-container"><div class="spinner"></div></div>`;
+
             try {
                 const res = await authFetch(`${API_BASE}/news`);
                 const news = await res.json();
-                
+
                 list.innerHTML = news.map(n => `
                     <div class="bg-white p-4 rounded-xl shadow-sm border flex gap-4 items-start">
                         ${n.image ? `<img src="${n.image}" class="w-16 h-16 object-cover rounded-lg">` : '<div class="w-16 h-16 bg-slate-100 rounded-lg flex items-center justify-center text-slate-300">No Img</div>'}
@@ -350,7 +416,7 @@
                 document.getElementById('addNewsForm').reset();
                 loadNews();
             } else { alert("Error uploading news"); }
-            btn.innerText = "Post News"; btn.disabled = false;
+            btn.innerText = "Post Noticia"; btn.disabled = false;
         };
 
         async function deleteNews(id) {
@@ -381,28 +447,6 @@
                 reader.readAsDataURL(file);
             });
         }
-
-        // --- MESSAGES ---
-        async function loadMessages() {
-            const list = document.getElementById('admin-messages-list');
-            
-            // 1. SHOW LOADING ANIMATION
-            list.innerHTML = `<div class="col-span-2 loader-container"><div class="spinner"></div></div>`;
-            
-            try {
-                const res = await authFetch(`${API_BASE}/admin/messages`);
-                const msgs = await res.json();
-                
-                list.innerHTML = msgs.map(m => `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-stone-200">
-                        <div class="flex justify-between items-start mb-2"><p class="font-bold text-stone-800 text-sm">${m.name}</p><button onclick="deleteMessage(${m.id})" class="text-red-400 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>
-                        <p class="text-xs text-stone-600 mb-3">${m.message}</p><p class="text-[9px] text-stone-400 uppercase font-bold">${m.email} ${m.company ? '| ' + m.company : ''}</p>
-                    </div>`).join('');
-                lucide.createIcons();
-            } catch(e) { console.error(e); }
-        }
-
-        async function deleteMessage(id) { if(confirm("Delete message?")) { await authFetch(`${API_BASE}/admin/messages/${id}`, {method:'DELETE'}); loadMessages(); } }
 
         // --- SETTINGS ---
         async function loadSettings() {
