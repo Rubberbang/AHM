@@ -1,9 +1,10 @@
 import os
-import threading # NEW: Needed for background emails
+import threading
+import json
+import urllib.request # Standard library for HTTPS requests
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_mail import Mail, Message
 from functools import wraps
 from datetime import datetime
 from werkzeug.security import check_password_hash
@@ -12,13 +13,9 @@ from sqlalchemy import text
 app = Flask(__name__)
 
 # --- CONFIGURATION ---
-
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'local-secret-key-only')
-
-# CORS: Allow all origins
 CORS(app, supports_credentials=True, origins=["*"])
 
-# DATABASE
 db_url = os.environ.get('DATABASE_URL')
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -27,21 +24,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///choir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# MAIL CONFIG
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465             # CHANGED: 587 -> 465
-app.config['MAIL_USE_TLS'] = False        # CHANGED: True -> False
-app.config['MAIL_USE_SSL'] = True         # CHANGED: False -> True
-app.config['MAIL_USERNAME'] = 'cayatapapia@gmail.com'
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = 'cayatapapia@gmail.com'
-
-mail = Mail(app)
+# PASTE YOUR GOOGLE SCRIPT URL HERE
+# Or set it in Render Environment Variables as 'GOOGLE_SCRIPT_URL'
+GOOGLE_SCRIPT_URL = os.environ.get('GOOGLE_SCRIPT_URL', 'PASTE_YOUR_WEB_APP_URL_HERE_IF_TESTING_LOCALLY')
 
 ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
 # --- MODELS ---
-
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -75,7 +64,6 @@ with app.app_context():
     db.create_all()
 
 # --- HELPER FUNCTIONS ---
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -85,14 +73,22 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def send_async_email(app, msg):
-    with app.app_context():
-        try:
-            mail.send(msg)
-            print(f"✅ EMAIL SUCCESS: Sent to {msg.recipients}", flush=True)
-        except Exception as e:
-            # This will print the exact error from Google to your Render logs
-            print(f"❌ EMAIL FAILED: {str(e)}", flush=True)
+# NEW: Relay email via Google Script (HTTPS)
+def send_google_script_email(data):
+    try:
+        if not GOOGLE_SCRIPT_URL or "script.google.com" not in GOOGLE_SCRIPT_URL:
+            print("❌ Email skipped: GOOGLE_SCRIPT_URL not set.")
+            return
+
+        req = urllib.request.Request(
+            GOOGLE_SCRIPT_URL,
+            data=json.dumps(data).encode('utf-8'),
+            headers={'Content-Type': 'application/json'}
+        )
+        with urllib.request.urlopen(req) as response:
+            print(f"✅ Email Relay Response: {response.read().decode('utf-8')}")
+    except Exception as e:
+        print(f"❌ Email Relay Failed: {e}")
 
 # --- ROUTES ---
 
@@ -111,7 +107,6 @@ def login():
         return jsonify({"status": "success", "token": "ahm_aruba_2024"})
     return jsonify({"status": "error"}), 401
 
-# --- EVENTS ---
 @app.route('/api/events', methods=['GET'], strict_slashes=False)
 def get_events():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -161,7 +156,6 @@ def manage_event(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
-# --- NEWS ---
 @app.route('/api/news', methods=['GET'], strict_slashes=False)
 def get_news():
     news = NewsPost.query.order_by(NewsPost.date.desc()).all()
@@ -190,7 +184,6 @@ def delete_news(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
-# --- SETTINGS ---
 @app.route('/api/content', methods=['GET'], strict_slashes=False)
 def get_content():
     content = SiteContent.query.all()
@@ -213,7 +206,6 @@ def save_content():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# --- MESSAGES & CONTACT ---
 @app.route('/api/admin/messages', methods=['GET'], strict_slashes=False)
 @login_required
 def get_messages():
@@ -228,6 +220,7 @@ def delete_message(id):
     db.session.commit()
     return jsonify({"status": "success"})
 
+# --- CONTACT ROUTE ---
 @app.route('/api/contact', methods=['POST'], strict_slashes=False)
 def contact():
     data = request.json
@@ -240,19 +233,8 @@ def contact():
         db.session.add(new_msg)
         db.session.commit()
 
-        # 2. Prepare Email
-        if app.config['MAIL_PASSWORD']:
-            msg = Message(
-                subject=f"AHM Website: {data['name']}",
-                # IMPORTANT: Sender must match your MAIL_USERNAME exactly
-                sender=app.config['MAIL_USERNAME'],
-                recipients=['cayatapapia@gmail.com'],
-                body=f"Name: {data['name']}\nEmail: {data['email']}\nCompany: {data.get('company', 'N/A')}\n\nMessage:\n{data['message']}"
-            )
-            # Start background thread
-            threading.Thread(target=send_async_email, args=(app, msg)).start()
-        else:
-            print("⚠️ Email skipped: MAIL_PASSWORD not set in environment.")
+        # 2. Send via Google Script Relay (Background)
+        threading.Thread(target=send_google_script_email, args=(data,)).start()
 
         return jsonify({"status": "success", "message": "Mensahe a drenta"}), 200
 
