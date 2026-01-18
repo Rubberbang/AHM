@@ -18,27 +18,27 @@
 
     <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
         <div class="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-xl max-w-sm w-full border border-stone-200">
-            <div class="w-16 h-16 bg-emerald-900 text-white rounded-2xl flex items-center justify-center mb-6 mx-auto">
+            <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center mb-6 mx-auto">
                 <i data-lucide="lock" class="w-8 h-8"></i>
             </div>
             <h1 class="text-2xl font-bold mb-6 text-center text-stone-800">Admin Login</h1>
             <input type="password" id="admin-password" placeholder="Password"
-                class="w-full p-4 border border-stone-200 rounded-xl mb-4 outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
-            <button onclick="login()" class="w-full py-4 bg-emerald-900 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-800 transition-all">Login</button>
+                class="w-full p-4 border border-stone-200 rounded-xl mb-4 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            <button onclick="login()" class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold shadow-lg hover:bg-slate-800 transition-all">Login</button>
         </div>
     </div>
 
     <div id="dashboard-screen" class="hidden">
-        <nav class="bg-emerald-900 text-white p-4 sticky top-0 z-50 shadow-md">
+        <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-md">
             <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2">
                     <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
                     <h1 class="text-xl font-bold">AHM Admin</h1>
                 </div>
-                <div class="flex gap-2 md:gap-4 items-center bg-emerald-800/50 p-1 rounded-xl">
-                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Eventos</button>
-                    <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Inbox</button>
-                    <button onclick="showTab('settings')" id="nav-settings" class="px-4 py-2 text-sm font-medium hover:bg-emerald-700/50 rounded-lg transition-all">Settings</button>
+                <div class="flex gap-2 md:gap-4 items-center bg-slate-800/50 p-1 rounded-xl">
+                    <button onclick="showTab('events')" id="nav-events" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Eventos</button>
+                    <button onclick="showTab('messages')" id="nav-messages" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Inbox</button>
+                    <button onclick="showTab('settings')" id="nav-settings" class="px-4 py-2 text-sm font-medium hover:bg-slate-700/50 rounded-lg transition-all">Settings</button>
                 </div>
                 <button onclick="logout()" class="text-xs bg-red-900/50 px-3 py-1.5 rounded-lg font-bold text-red-100 hover:bg-red-800 transition-all">Logout</button>
             </div>
@@ -48,7 +48,7 @@
 
             <div id="tab-events" class="tab-content">
                 <div class="lg:hidden mb-6">
-                    <button onclick="toggleMobileForm()" id="mobile-form-btn" class="w-full py-4 bg-white border-2 border-emerald-900 text-emerald-900 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm">
+                    <button onclick="toggleMobileForm()" id="mobile-form-btn" class="w-full py-4 bg-white border-2 border-slate-900 text-slate-900 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-sm">
                         <i data-lucide="plus-circle" class="w-5 h-5"></i><span id="btn-text">Evento nobo</span>
                     </button>
                 </div>
@@ -61,21 +61,21 @@
                             </h2>
                             <form id="addEventForm" class="space-y-4">
                                 <input type="hidden" id="ev-id">
-                                <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <input type="date" id="ev-date" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <input type="time" id="ev-time" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <input type="text" id="ev-location" placeholder="Luga" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
-                                <textarea id="ev-description" placeholder="Descripcion" rows="3" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                                <select id="ev-type" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500">
+                                <input type="text" id="ev-title" placeholder="Titulo di Evento" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="date" id="ev-date" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="time" id="ev-time" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="text" id="ev-location" placeholder="Luga" required class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
+                                <textarea id="ev-description" placeholder="Descripcion" rows="3" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <select id="ev-type" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="Mass">Mass</option><option value="Concert">Concert</option><option value="Special Service">Special Service</option>
                                 </select>
-                                <button type="submit" id="submit-btn" class="w-full py-4 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Evento</button>
+                                <button type="submit" id="submit-btn" class="w-full py-4 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Save Evento</button>
                             </form>
                         </div>
                     </div>
                     <div class="lg:col-span-2 space-y-10">
                         <section>
-                            <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2"><i data-lucide="calendar-days" class="text-emerald-600 w-5 h-5"></i>Eventonan Biniendo</h2>
+                            <h2 class="text-xl font-bold mb-6 text-stone-800 flex items-center gap-2"><i data-lucide="calendar-days" class="text-slate-600 w-5 h-5"></i>Eventonan Biniendo</h2>
                             <div id="admin-events-list" class="space-y-4"></div>
                         </section>
                         <section class="pt-8 border-t border-stone-200">
@@ -87,23 +87,23 @@
             </div>
 
             <div id="tab-messages" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="mail" class="text-emerald-600 w-6 h-6"></i>Inbox</h2>
+                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="mail" class="text-slate-600 w-6 h-6"></i>Inbox</h2>
                 <div id="admin-messages-list" class="grid md:grid-cols-2 gap-4"></div>
             </div>
 
             <div id="tab-settings" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="settings" class="text-emerald-600 w-6 h-6"></i>Site Settings</h2>
+                <h2 class="text-2xl font-bold mb-8 text-stone-800 flex items-center gap-2"><i data-lucide="settings" class="text-slate-600 w-6 h-6"></i>Site Settings</h2>
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-stone-200 max-w-lg">
-                    <h3 class="font-serif text-lg font-bold text-emerald-900 mb-4">Liturgical Color Season</h3>
+                    <h3 class="font-serif text-lg font-bold text-slate-900 mb-4">Liturgical Color Season</h3>
                     <p class="text-sm text-stone-500 mb-4">Select the accent color for the website based on the current liturgical season.</p>
                     <div class="space-y-4">
-                        <select id="sel-theme-color" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 bg-stone-50 font-bold text-stone-700">
+                        <select id="sel-theme-color" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500 bg-stone-50 font-bold text-stone-700">
                             <option value="emerald">Green (Ordinary Time)</option>
                             <option value="violet">Purple (Advent/Lent)</option>
                             <option value="rose">Red (Pentecost/Martyrs)</option>
                             <option value="amber">Gold (Easter/Christmas)</option>
                         </select>
-                        <button onclick="saveSettings()" class="w-full py-3 bg-emerald-700 text-white rounded-xl font-bold shadow-lg hover:bg-emerald-600 transition-all">Save Color Settings</button>
+                        <button onclick="saveSettings()" class="w-full py-3 bg-blue-700 text-white rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all">Save Color Settings</button>
                     </div>
                 </div>
             </div>
@@ -149,8 +149,8 @@
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('#nav-events, #nav-messages, #nav-settings').forEach(b => b.classList.remove('bg-emerald-700', 'text-white'));
-            document.getElementById(`nav-${tab}`).classList.add('bg-emerald-700', 'text-white');
+            document.querySelectorAll('#nav-events, #nav-messages, #nav-settings').forEach(b => b.classList.remove('bg-blue-700', 'text-white'));
+            document.getElementById(`nav-${tab}`).classList.add('bg-blue-700', 'text-white');
             if(tab === 'settings') loadSettings();
         }
 
@@ -186,7 +186,7 @@
                             </div>
                         </div>
                         <div class="flex gap-1 md:gap-2">
-                            <button onclick="editEvent(${e.id})" class="p-2 bg-emerald-50 rounded-lg hover:bg-emerald-100 border border-emerald-100" title="Edit"><i data-lucide="pencil" class="w-4 h-4 text-emerald-600"></i></button>
+                            <button onclick="editEvent(${e.id})" class="p-2 bg-blue-50 rounded-lg hover:bg-blue-100 border border-blue-100" title="Edit"><i data-lucide="pencil" class="w-4 h-4 text-blue-600"></i></button>
                             <button onclick="toggleCancel(${e.id}, ${!isCanceled})" class="p-2 bg-stone-100 rounded-lg hover:bg-amber-100" title="Cancel/Uncancel"><i data-lucide="slash" class="w-4 h-4 text-amber-600"></i></button>
                             <button onclick="deleteEvent(${e.id})" class="p-2 bg-stone-100 rounded-lg hover:bg-red-100" title="Delete"><i data-lucide="trash-2" class="w-4 h-4 text-red-500"></i></button>
                         </div>
@@ -253,10 +253,9 @@
             lucide.createIcons();
         }
 
-        // --- SETTINGS LOGIC ---
         async function loadSettings() {
             try {
-                const res = await authFetch(`${API_BASE}/content`); // Re-using content API
+                const res = await authFetch(`${API_BASE}/content`);
                 if(!res.ok) return;
                 const data = await res.json();
                 document.getElementById('sel-theme-color').value = data.theme_color || "emerald";
@@ -266,8 +265,7 @@
         async function saveSettings() {
             const color = document.getElementById('sel-theme-color').value;
             const res = await authFetch(`${API_BASE}/content`, {
-                method: 'POST',
-                body: JSON.stringify({ theme_color: color })
+                method: 'POST', body: JSON.stringify({ theme_color: color })
             });
             if(res.ok) alert("Color Updated! Refresh the main site to see changes.");
         }
