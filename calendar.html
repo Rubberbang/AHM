@@ -54,8 +54,7 @@
             height: 40px;
             border: 4px solid #e5e5e5;
             /* Light Emerald */
-            border-top: 4px solid #6d6d6d
-            ;
+            border-top: 4px solid #6d6d6d;
             /* Dark Emerald */
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -87,11 +86,39 @@
                     data-t="calendar">Kalender</a>
                 <a href="/contact" class="hover:text-emerald-300" data-t="contact">Contacto</a>
                 <a href="/news" class="hover:text-emerald-300">Noticia</a>
-                <select id="langSelect" class="bg-emerald-800 text-white text-xs p-1 rounded lang-selector">
-                    <option value="pap">PAP 🇦🇼</option>
-                    <option value="en">EN 🇺🇸</option>
-                    <option value="es">ES 🇪🇸</option>
-                </select>
+                <div class="relative ml-4 group z-50">
+                    <button
+                        class="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 px-3 py-2 rounded-lg transition-colors border border-emerald-700 shadow-sm">
+                        <img id="desk-flag" src="https://flagcdn.com/h24/aw.png" alt="Lang"
+                            class="h-4 w-6 object-cover rounded-sm">
+                        <span id="desk-text" class="text-xs font-bold tracking-wide">PAP</span>
+                        <i data-lucide="chevron-down" class="w-3 h-3 opacity-70"></i>
+                    </button>
+
+                    <div class="absolute right-0 top-full pt-2 w-32 hidden group-hover:block">
+                        <div
+                            class="bg-white text-stone-800 rounded-xl shadow-xl border border-stone-100 overflow-hidden">
+                            <button onclick="setLang('pap')"
+                                class="flex items-center gap-3 w-full px-4 py-3 hover:bg-stone-50 transition-colors border-b border-stone-50">
+                                <img src="https://flagcdn.com/h24/aw.png"
+                                    class="h-4 w-6 object-cover rounded-sm shadow-sm">
+                                <span class="text-sm font-bold text-stone-600">PAP</span>
+                            </button>
+                            <button onclick="setLang('en')"
+                                class="flex items-center gap-3 w-full px-4 py-3 hover:bg-stone-50 transition-colors border-b border-stone-50">
+                                <img src="https://flagcdn.com/h24/us.png"
+                                    class="h-4 w-6 object-cover rounded-sm shadow-sm">
+                                <span class="text-sm font-bold text-stone-600">EN</span>
+                            </button>
+                            <button onclick="setLang('es')"
+                                class="flex items-center gap-3 w-full px-4 py-3 hover:bg-stone-50 transition-colors">
+                                <img src="https://flagcdn.com/h24/es.png"
+                                    class="h-4 w-6 object-cover rounded-sm shadow-sm">
+                                <span class="text-sm font-bold text-stone-600">ES</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <button class="md:hidden p-2" onclick="toggleMenu()"><i data-lucide="menu" id="menu-icon"></i></button>
         </div>
@@ -101,11 +128,26 @@
             <a href="/calendar" class="block text-lg font-bold border-b border-emerald-700 pb-2"
                 data-t="calendar">Kalender</a>
             <a href="/contact" class="block text-lg" data-t="contact">Contacto</a>
-            <select id="langSelectMobile" class="bg-emerald-900 text-white p-2 rounded w-full lang-selector">
-                <option value="pap">PAP</option>
-                <option value="en">EN</option>
-                <option value="es">ES</option>
-            </select>
+            <div class="flex items-center justify-center gap-6 py-4 border-t border-emerald-700 mt-2">
+                <button onclick="setLang('pap')" id="mob-btn-pap"
+                    class="flex flex-col items-center gap-1 opacity-50 transition-all">
+                    <img src="https://flagcdn.com/h40/aw.png"
+                        class="h-8 w-auto rounded shadow-md ring-2 ring-transparent transition-all" id="mob-img-pap">
+                    <span class="text-[10px] font-bold">PAP</span>
+                </button>
+                <button onclick="setLang('en')" id="mob-btn-en"
+                    class="flex flex-col items-center gap-1 opacity-50 transition-all">
+                    <img src="https://flagcdn.com/h40/us.png"
+                        class="h-8 w-auto rounded shadow-md ring-2 ring-transparent transition-all" id="mob-img-en">
+                    <span class="text-[10px] font-bold">EN</span>
+                </button>
+                <button onclick="setLang('es')" id="mob-btn-es"
+                    class="flex flex-col items-center gap-1 opacity-50 transition-all">
+                    <img src="https://flagcdn.com/h40/es.png"
+                        class="h-8 w-auto rounded shadow-md ring-2 ring-transparent transition-all" id="mob-img-es">
+                    <span class="text-[10px] font-bold">ES</span>
+                </button>
+            </div>
             <div class="flex gap-6 pt-4 justify-start">
                 <a href="#" target="_blank" class="hover:text-emerald-300 transition-colors"><i
                         data-lucide="facebook"></i></a>
