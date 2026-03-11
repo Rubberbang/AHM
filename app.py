@@ -24,9 +24,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///choir.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# PASTE YOUR GOOGLE SCRIPT URL HERE
-# Or set it in Render Environment Variables as 'GOOGLE_SCRIPT_URL'
-GOOGLE_SCRIPT_URL = os.environ.get('GOOGLE_SCRIPT_URL', 'PASTE_YOUR_WEB_APP_URL_HERE_IF_TESTING_LOCALLY')
+GOOGLE_SCRIPT_URL = os.environ.get('GOOGLE_SCRIPT_URL')
 
 ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
