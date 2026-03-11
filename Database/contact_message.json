@@ -1,0 +1,34 @@
+[
+    {
+        "id": 7,
+        "name": "Ruben",
+        "email": "rubberbangg@gmail.com",
+        "company": "",
+        "message": "boso website ta cla",
+        "timestamp": "2025-12-27 02:36:10.963725"
+    },
+    {
+        "id": 10,
+        "name": "Sidney Tromp",
+        "email": "sidtromp@gmail.com",
+        "company": "HMUF",
+        "message": "Con mi por hasi pa drenta boso grupo. Mi guste masha hopi mes.",
+        "timestamp": "2025-12-29 04:41:36.920832"
+    },
+    {
+        "id": 11,
+        "name": "Daniel Edwards",
+        "email": "daniel.websolution013@gmail.com",
+        "company": "Digital Marketing Agency",
+        "message": "Hello, \n\nWe have completed the review of your website, and it appears that your site is currently struggling to appear on search engines such as Google and Bing when users search for keywords related to your business. This issue is primarily due to the lack of proper Search Engine Optimization (SEO). \n\nWe understand that your goal in creating this website is to attract more clients and grow your business. If that is the case, we recommend replying to this email with your phone number and a suitable time for a call. This will allow us to discuss a clear and effective solution to improve your website\u2019s visibility and ensure it ranks among the top search results across all major search engines. \n\nWe look forward to hearing from you. \n\nThank you, \nDaniel\u00a0Edwards",
+        "timestamp": "2025-12-30 14:03:06.696105"
+    },
+    {
+        "id": 12,
+        "name": "Ruben",
+        "email": "ruben@dushi.dev",
+        "company": "Dushi Developers Aruba",
+        "message": "e mensahe aki ta pa confirma e update di e website, mi a implementa e opci\u00f3n pa admins cambia e color, mi a google ki color ta bin dilanti den liturgia, mi a implementa un loading icon pa ora e contenido no a load, mi a drecha e dropdown pa scohe e language. tambe e admins por edit un evento awo embes di mester delete y add un evento di nobo. mi a trata e feature pa noticia.",
+        "timestamp": "2026-01-18 18:13:33.103340"
+    }
+]

@@ -1,0 +1,112 @@
+[
+    {
+        "id": 5,
+        "title": "Festival di Dande",
+        "location": "Centro di Bario Tanki Leendert",
+        "date": "2025-12-28",
+        "time": "18:00",
+        "description": "25 edicion festival di dande.\nInfantil - Hubenil",
+        "type": "Special Service",
+        "is_canceled": false
+    },
+    {
+        "id": 7,
+        "title": "Dande ",
+        "location": "Rotonde di Paradera",
+        "date": "2025-12-29",
+        "time": "17:30",
+        "description": "Bin join nos pa wak gaita y dande \ud83c\udf89\ud83c\udfa4\ud83d\udd0a",
+        "type": "Concert",
+        "is_canceled": false
+    },
+    {
+        "id": 9,
+        "title": "Cas pa nos grandinan Amalia",
+        "location": "Oranjestad",
+        "date": "2026-01-02",
+        "time": "15:00",
+        "description": "AHM lo canta Dande pa nos grandinan",
+        "type": "Special Service",
+        "is_canceled": false
+    },
+    {
+        "id": 11,
+        "title": "Misa y adoracion na honor di Sagrado Curason di Hesus",
+        "location": "Misa Birgen di Fatima Dakota (Milonstraat z/n)",
+        "date": "2026-01-02",
+        "time": "19:00",
+        "description": "Koor AHM lo anima e prome misa na honor di Sagrado Curason di Hesus pa a\u00f1a 2026. Despues di Santa Communion nos lo adora Hesus den Santisimo Sacramento di Altar un momento cantando e Rosario di dibina Misericordia.",
+        "type": "Mass",
+        "is_canceled": false
+    },
+    {
+        "id": 12,
+        "title": "Fiesta priva compania",
+        "location": "San Miguel Noord",
+        "date": "2026-01-02",
+        "time": "21:00",
+        "description": "AHM lo trese e dande y anima cu canticanan di Pasco y fin di a\u00f1a na e fiesta priva di un compania.",
+        "type": "Special Service",
+        "is_canceled": false
+    },
+    {
+        "id": 14,
+        "title": "Fiesta familiar priva",
+        "location": "Noord",
+        "date": "2026-01-02",
+        "time": "16:00",
+        "description": "AHM lo trese e dande y anima un fiesta familiar priva.",
+        "type": "Special Service",
+        "is_canceled": false
+    },
+    {
+        "id": 16,
+        "title": "Misa na honor di Inmaculada Curason di mama Maria",
+        "location": "Misa Birgen di Fatima Dakota (Milonstraat z/n)",
+        "date": "2026-01-03",
+        "time": "08:00",
+        "description": "Prome misa pa a\u00f1a 2026 dedica na honor di Inmaculada Curason di mama Maria.",
+        "type": "Mass",
+        "is_canceled": false
+    },
+    {
+        "id": 19,
+        "title": "Misa hubenil Santa Filomena",
+        "location": "Parokia Santa Filomena",
+        "date": "2026-01-11",
+        "time": "10:00",
+        "description": "Koor AHM lo anima misa hubenil hunto cu grupo hobennan di Santa Filomena.",
+        "type": "Mass",
+        "is_canceled": false
+    },
+    {
+        "id": 20,
+        "title": "Misa San Francisco ",
+        "location": "Parokia Pro Catedral San Francisco Playa",
+        "date": "2026-01-18",
+        "time": "09:00",
+        "description": "Koor AHM lo anima misa.",
+        "type": "Mass",
+        "is_canceled": false
+    },
+    {
+        "id": 21,
+        "title": "Prome Misa di Youth Ministry Aruba pa a\u00f1a 2026",
+        "location": "Parokia Birgen di Fatima Dakota",
+        "date": "2026-01-24",
+        "time": "19:00",
+        "description": "AHM lo anima e prome misa organisa pa Youth Ministry Aruba.\n\nDespues di misa lo sigui cu e encuentro hubenil di Youth Ministry Aruba di 8:30pm - 11:00pm.",
+        "type": "Mass",
+        "is_canceled": false
+    },
+    {
+        "id": 22,
+        "title": "Se\u00f1or de los milagros",
+        "location": "Wayaka # 32",
+        "date": "2026-01-14",
+        "time": "19:00",
+        "description": "Koor AHM lo anima e prome Santo Sacrificio di Misa pa a\u00f1a 2026, celebra pa pader Juancho Pilongo.",
+        "type": "Mass",
+        "is_canceled": false
+    }
+]
