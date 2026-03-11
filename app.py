@@ -2,6 +2,7 @@ import os
 import threading
 import json
 import urllib.request
+import gspread
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from functools import wraps
@@ -17,40 +18,68 @@ CORS(app, supports_credentials=True, origins=["*"])
 GOOGLE_SCRIPT_URL = os.environ.get('GOOGLE_SCRIPT_URL')
 ADMIN_HASH = os.environ.get('ADMIN_HASH', 'no-hash-provided')
 
-# --- JSON DATABASE SETUP ---
-DB_DIR = 'Database'
-os.makedirs(DB_DIR, exist_ok=True)  # Creates the folder if it doesn't exist
-db_lock = threading.Lock()  # Prevents file corruption if 2 users save at exactly the same time
+# --- GOOGLE SHEETS SETUP ---
+# This connects to Google using the secret file you put next to app.py (or in Render Secret Files)
+try:
+    gc = gspread.service_account(filename='google_credentials.json')
+    db_sheet = gc.open('Choir_Database')
+    print("✅ Successfully connected to Google Sheets!")
+except Exception as e:
+    print(f"❌ Failed to connect to Google Sheets. Check your credentials file and sharing permissions! Error: {e}")
+
+# We define the column headers for each tab so Python knows how to format the data when rewriting
+HEADERS = {
+    'Event': ['id', 'title', 'location', 'date', 'time', 'description', 'type', 'is_canceled'],
+    'NewsPost': ['id', 'title', 'date', 'content', 'image'],
+    'SiteContent': ['key', 'value'],
+    'ContactMessage': ['id', 'name', 'email', 'company', 'message', 'timestamp']
+}
 
 
-def get_file_path(table_name):
-    return os.path.join(DB_DIR, f"{table_name}.json")
-
-
-def read_table(table_name):
-    """Reads a JSON file and returns it as a list of dictionaries."""
-    path = get_file_path(table_name)
-    if not os.path.exists(path):
+def read_table(tab_name):
+    """Reads a tab and returns a list of dictionaries."""
+    try:
+        worksheet = db_sheet.worksheet(tab_name)
+        return worksheet.get_all_records()
+    except Exception as e:
+        print(f"Error reading {tab_name}: {e}")
         return []
-    with open(path, 'r', encoding='utf-8') as f:
-        try:
-            return json.load(f)
-        except json.JSONDecodeError:
-            return []
 
 
-def write_table(table_name, data):
-    """Writes a list of dictionaries back to a JSON file."""
-    with db_lock:
-        with open(get_file_path(table_name), 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4)
+def write_table(tab_name, data_list):
+    """Clears the tab and rewrites all the data (useful for edits and deletes)."""
+    try:
+        worksheet = db_sheet.worksheet(tab_name)
+        headers = HEADERS[tab_name]
+
+        # Convert our list of dictionaries back into a list of lists for Google Sheets
+        rows = [headers]
+        for item in data_list:
+            rows.append([item.get(h, "") for h in headers])
+
+        worksheet.clear()
+        worksheet.update(values=rows, range_name="A1")
+    except Exception as e:
+        print(f"Error writing to {tab_name}: {e}")
+
+
+def append_to_table(tab_name, new_data_dict):
+    """Simply adds one new row to the bottom (faster for new messages/events)."""
+    try:
+        worksheet = db_sheet.worksheet(tab_name)
+        headers = HEADERS[tab_name]
+        new_row = [new_data_dict.get(h, "") for h in headers]
+        worksheet.append_row(new_row)
+    except Exception as e:
+        print(f"Error appending to {tab_name}: {e}")
 
 
 def generate_id(table_data):
-    """Finds the highest ID in the table and adds 1 (like Auto-Increment in SQL)."""
+    """Finds the highest ID and adds 1."""
     if not table_data:
         return 1
-    return max((item.get('id', 0) for item in table_data), default=0) + 1
+    # Convert IDs to integers just in case Google Sheets reads them as strings
+    return max((int(item.get('id', 0)) for item in table_data if str(item.get('id')).isdigit()), default=0) + 1
 
 
 # --- HELPER FUNCTIONS ---
@@ -68,16 +97,13 @@ def login_required(f):
 def send_google_script_email(data):
     try:
         if not GOOGLE_SCRIPT_URL or "script.google.com" not in GOOGLE_SCRIPT_URL:
-            print("❌ Email skipped: GOOGLE_SCRIPT_URL not set.")
             return
-
         req = urllib.request.Request(
             GOOGLE_SCRIPT_URL,
             data=json.dumps(data).encode('utf-8'),
             headers={'Content-Type': 'application/json'}
         )
-        with urllib.request.urlopen(req) as response:
-            print(f"✅ Email Relay Response: {response.read().decode('utf-8')}")
+        urllib.request.urlopen(req)
     except Exception as e:
         print(f"❌ Email Relay Failed: {e}")
 
@@ -86,7 +112,7 @@ def send_google_script_email(data):
 
 @app.route('/')
 def health_check():
-    return "AHM Backend Active & JSON Files Connected."
+    return "AHM Backend Active & Google Sheets Connected."
 
 
 @app.route('/api/login', methods=['POST'], strict_slashes=False)
@@ -101,9 +127,8 @@ def login():
 def get_events():
     today = datetime.now().strftime('%Y-%m-%d')
     events = read_table('Event')
-    # Filter for future events and sort by date
-    future_events = [e for e in events if e.get('date', '') >= today]
-    future_events.sort(key=lambda x: x.get('date', ''))
+    future_events = [e for e in events if str(e.get('date', '')) >= today]
+    future_events.sort(key=lambda x: str(x.get('date', '')))
     return jsonify(future_events)
 
 
@@ -111,7 +136,7 @@ def get_events():
 @login_required
 def get_all_events():
     events = read_table('Event')
-    events.sort(key=lambda x: x.get('date', ''), reverse=True)
+    events.sort(key=lambda x: str(x.get('date', '')), reverse=True)
     return jsonify(events)
 
 
@@ -130,8 +155,7 @@ def add_event():
         "type": data.get('type'),
         "is_canceled": False
     }
-    events.append(new_event)
-    write_table('Event', events)
+    append_to_table('Event', new_event)
     return jsonify({"status": "success"})
 
 
@@ -139,7 +163,7 @@ def add_event():
 @login_required
 def manage_event(id):
     events = read_table('Event')
-    event_index = next((index for (index, d) in enumerate(events) if d["id"] == id), None)
+    event_index = next((index for (index, d) in enumerate(events) if str(d.get("id")) == str(id)), None)
 
     if event_index is None:
         return jsonify({"status": "error", "message": "Event not found"}), 404
@@ -167,7 +191,7 @@ def manage_event(id):
 @app.route('/api/news', methods=['GET'], strict_slashes=False)
 def get_news():
     news = read_table('NewsPost')
-    news.sort(key=lambda x: x.get('date', ''), reverse=True)
+    news.sort(key=lambda x: str(x.get('date', '')), reverse=True)
     return jsonify(news)
 
 
@@ -183,8 +207,7 @@ def add_news():
         "content": data.get('content'),
         "image": data.get('image')
     }
-    news.append(new_post)
-    write_table('NewsPost', news)
+    append_to_table('NewsPost', new_post)
     return jsonify({"status": "success"})
 
 
@@ -192,7 +215,7 @@ def add_news():
 @login_required
 def delete_news(id):
     news = read_table('NewsPost')
-    news = [n for n in news if n.get('id') != id]  # Keep all EXCEPT the one to delete
+    news = [n for n in news if str(n.get('id')) != str(id)]
     write_table('NewsPost', news)
     return jsonify({"status": "success"})
 
@@ -200,8 +223,7 @@ def delete_news(id):
 @app.route('/api/content', methods=['GET'], strict_slashes=False)
 def get_content():
     content = read_table('SiteContent')
-    # Convert list of dicts [{"key": "about", "value": "text"}] to {"about": "text"}
-    content_dict = {item['key']: item['value'] for item in content}
+    content_dict = {item['key']: item['value'] for item in content if 'key' in item}
     return jsonify(content_dict)
 
 
@@ -213,8 +235,7 @@ def save_content():
         content = read_table('SiteContent')
 
         for key, value in data.items():
-            # Find if key exists
-            existing_item = next((item for item in content if item['key'] == key), None)
+            existing_item = next((item for item in content if item.get('key') == key), None)
             if existing_item:
                 existing_item['value'] = value
             else:
@@ -230,7 +251,7 @@ def save_content():
 @login_required
 def get_messages():
     msgs = read_table('ContactMessage')
-    msgs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+    msgs.sort(key=lambda x: str(x.get('timestamp', '')), reverse=True)
     return jsonify(msgs)
 
 
@@ -238,7 +259,7 @@ def get_messages():
 @login_required
 def delete_message(id):
     msgs = read_table('ContactMessage')
-    msgs = [m for m in msgs if m.get('id') != id]
+    msgs = [m for m in msgs if str(m.get('id')) != str(id)]
     write_table('ContactMessage', msgs)
     return jsonify({"status": "success"})
 
@@ -248,20 +269,18 @@ def delete_message(id):
 def contact():
     data = request.json
     try:
-        # 1. Save to JSON Database
-        msgs = read_table('ContactMessage')
+        # Save to Google Sheets directly via append_to_table (super fast!)
         new_msg = {
-            "id": generate_id(msgs),
+            "id": str(int(datetime.now().timestamp())),
             "name": data.get('name'),
             "email": data.get('email'),
             "company": data.get('company', ''),
             "message": data.get('message'),
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        msgs.append(new_msg)
-        write_table('ContactMessage', msgs)
+        append_to_table('ContactMessage', new_msg)
 
-        # 2. Send via Google Script Relay (Background)
+        # Relay email in background
         threading.Thread(target=send_google_script_email, args=(data,)).start()
 
         return jsonify({"status": "success", "message": "Mensahe a drenta"}), 200
